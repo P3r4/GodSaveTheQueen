@@ -24,6 +24,10 @@ public class BovespaLog {
 		this.setVolumeOfTradedShares(logTxt);
 		this.setFactor(logTxt);
 	}
+
+	public float getUnitaryOpeningPrice(){
+		return this.openingPrice/this.factor;
+	}
 	
 	String logCode;
 
