@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class BovespaDigest {
 
@@ -21,6 +21,15 @@ public class BovespaDigest {
 	Map<String, BovespaShare> bovespaShareMap;
 	Set<Integer> logDaySet;
 	Set<String> tradeCodeSet;
+	
+	public Set<Integer> getLogDaySet(){
+		return logDaySet;
+	} 
+	
+	public Set<String> getTradeCodeSet(){
+		return tradeCodeSet;
+	}
+	
 
 	private boolean marketCodeCondition(BovespaLog log) {
 		int i = 0;
@@ -33,7 +42,6 @@ public class BovespaDigest {
 	public BovespaDigest(String fileName) throws IOException {
 		initFlags();
 		initBovespaLogList(fileName);
-		
 		initBovespaShareMap();
 		initWritingKeys();
 	}
@@ -42,7 +50,7 @@ public class BovespaDigest {
 		marketCodeList = new ArrayList<>();
 		marketCodeList.add("010");
 		marketCodeList.add("020");
-		size = 174;
+		size = 200;
 	}
 
 	private void initBovespaLogList(String fileName) throws IOException {
@@ -74,8 +82,8 @@ public class BovespaDigest {
 	}
 	
 	private void initWritingKeys() {
-		logDaySet = new LinkedHashSet<>();
-		tradeCodeSet = new LinkedHashSet<>();
+		logDaySet = new TreeSet<>();
+		tradeCodeSet = new TreeSet<>();
 		for (BovespaLog log : bovespaLogList) {
 			if (marketCodeCondition(log) && bovespaShareMap.get(log.tradeCode).logDayMap.size() > size) {
 				logDaySet.add(log.logDay);
