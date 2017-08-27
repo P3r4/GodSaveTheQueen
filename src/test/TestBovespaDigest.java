@@ -27,12 +27,12 @@ public class TestBovespaDigest {
 	    for(String code : codes){
 	    	assertTrue(code.compareTo(lastS)>=0);
 	    }
-	    /*
+	    
 		String path = "./samples/digestedCSV/digestedBovespa2011k.csv";
 		File f = new File(path);
 		f.delete();
 		digest.writeDigestedCSVFile(path);
-		*/
+		
 	}
 
 }

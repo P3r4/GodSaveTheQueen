@@ -21,15 +21,14 @@ public class BovespaDigest {
 	Map<String, BovespaShare> bovespaShareMap;
 	Set<Integer> logDaySet;
 	Set<String> tradeCodeSet;
-	
-	public Set<Integer> getLogDaySet(){
+
+	public Set<Integer> getLogDaySet() {
 		return logDaySet;
-	} 
-	
-	public Set<String> getTradeCodeSet(){
+	}
+
+	public Set<String> getTradeCodeSet() {
 		return tradeCodeSet;
 	}
-	
 
 	private boolean marketCodeCondition(BovespaLog log) {
 		int i = 0;
@@ -66,7 +65,7 @@ public class BovespaDigest {
 	}
 
 	private void initBovespaShareMap() {
-				
+
 		bovespaShareMap = new HashMap<>();
 		for (BovespaLog log : bovespaLogList) {
 			if (marketCodeCondition(log)) {
@@ -80,7 +79,7 @@ public class BovespaDigest {
 			}
 		}
 	}
-	
+
 	private void initWritingKeys() {
 		logDaySet = new TreeSet<>();
 		tradeCodeSet = new TreeSet<>();
@@ -94,26 +93,23 @@ public class BovespaDigest {
 
 	public void writeDigestedCSVFile(String fileName) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(fileName);
-		String line = "row,tradeCode";
+		String line = "tradeCode";
 		Integer[] logDayArray = logDaySet.toArray(new Integer[logDaySet.size()]);
 		for (Integer logDay : logDayArray) {
 			line += "," + logDay;
 		}
 		writer.println(line);
 
-		int i = 0;
-		
 		for (String tradeCode : tradeCodeSet.toArray(new String[tradeCodeSet.size()])) {
-			line = i + "," + tradeCode;
+			line = tradeCode;
 			for (Integer logDay : logDayArray) {
-				if(bovespaShareMap.get(tradeCode).logDayMap.containsKey(logDay)){
+				if (bovespaShareMap.get(tradeCode).logDayMap.containsKey(logDay)) {
 					line += "," + bovespaShareMap.get(tradeCode).logDayMap.get(logDay).getUnitaryOpeningPrice();
-				}else{
+				} else {
 					line += ",null";
 				}
 			}
 			writer.println(line);
-			i++;
 		}
 
 		writer.close();
