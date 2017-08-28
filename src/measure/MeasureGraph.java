@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Stack;
 
 import graph.*;
@@ -72,63 +76,103 @@ public class MeasureGraph {
 	}
 
 	public void writeCorrCSVFile(String fileName, double limit) throws IOException {
-		int qtt = markEdgesAboveLimit(limit);
+		int qtt = markEdges(limit);
 		PrintWriter writer = new PrintWriter(fileName);
 
 		for (int i = -1; i < qtt; i++) {
 			writer.println("#vertexList: " + i);
 			for (Vertex<MeasureLog, MeasureLink> vertex : this.graph.getVertexList()) {
 				if (vertex.getContent().flag == i) {
-					writer.println(vertex.getSeqId() + " " + vertex.getContent().tradeCode);
+					writer.println(vertex.getSeqId() + "," + vertex.getContent().tradeCode);
 				}
 			}
 		}
 
-		writer.println("#edgeList: ");
-		for (Edge<MeasureLog, MeasureLink> edge : this.graph.getEdgeList()) {
-			writer.println(edge.getVertexA().getSeqId() + " " + edge.getVertexB().getSeqId() + " "
-					+ edge.getRelation().correlation);
+		for (int i = -1; i < qtt; i++) {
+
+			writer.println("#edgeList: " + i);
+			for (Edge<MeasureLog, MeasureLink> edge : this.graph.getEdgeList()) {
+				if (edge.getRelation().flag == i) {
+					writer.println(edge.getVertexA().getSeqId() + "," + edge.getVertexB().getSeqId() + ","
+							+ edge.getRelation().correlation);
+				}
+			}
 		}
 
 		writer.close();
 	}
 
-	public int markEdgesAboveLimit(double limit) {
+	public void insertSorted(int [][] pairs,  int [] pair){
+		int i = 0;
+		while(i < pairs.length && pairs[i][1] <= pair[1]){
+			i++;
+		}
+		if(i < pairs.length){
+			
+		}
+	}
+	
+	public void countLevelForAll(){
+		int count;
+		float x=0;
+		
+		for (Vertex<MeasureLog, MeasureLink> v : graph.getVertexList()) {
+			count = 0;
+			for (Edge<MeasureLog, MeasureLink> edge : v.getEdgeList()) {
+				if(edge.getRelation().flag != -1){
+					count++;
+				}
+			}
+			v.getContent().level = count;
+			x += count;
+			
+		}
+		System.out.println(x/graph.getVertexList().size());
+	}
+	
+	
+	public int markEdges(double limit) {
 		for (Edge<MeasureLog, MeasureLink> edge : this.graph.getEdgeList()) {
 			if (edge.getRelation().correlation > limit) {
 				edge.getRelation().flag = -1;
 			}
 		}
 
+		countLevelForAll();
+		
+		
 		Stack<Vertex<MeasureLog, MeasureLink>> s = new Stack<>();
 		int mark = 0;
 		Vertex<MeasureLog, MeasureLink> marked;
+		//System.out.println(graph.getVertexList().size());
 		for (Vertex<MeasureLog, MeasureLink> v : graph.getVertexList()) {
-			mark++;
+
 			if (v.getContent().flag == 0) {
+				mark++;
 				v.getContent().flag = mark;
 				s.push(v);
 			}
 			while (!s.isEmpty()) {
 				marked = s.pop();
-				System.out.println(marked.getSeqId());
+			//	System.out.println(marked.getSeqId());
 				for (Edge<MeasureLog, MeasureLink> edge : marked.getEdgeList()) {
-					System.out.println(edge.getRelation().flag + " " + edge.getRelation().correlation + " "
-							+ edge.getVertexB().getContent().flag + " " + edge.getVertexB().getSeqId());
+				//	System.out.println(edge.getRelation().flag + " " + edge.getRelation().correlation + " "
+				//			+ edge.getVertexB().getContent().flag + " " + edge.getVertexB().getSeqId());
 
 					if (edge.getRelation().flag == 0 && edge.getVertexB().getContent().flag == 0) {
-						edge.getRelation().flag = mark;
 						edge.getVertexB().getContent().flag = mark;
 						s.push(edge.getVertexB());
+					} else if (edge.getRelation().flag > -1) {
+						edge.getRelation().flag = mark;
 					}
 				}
-				System.out.println(">>>>>>" + s.size());
+				//System.out.println(">>>>>>" + s.size());
 
 			}
 
 		}
 
-		return mark;
+		return mark + 1;
 	}
 
 }

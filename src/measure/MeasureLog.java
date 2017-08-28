@@ -11,6 +11,7 @@ public class MeasureLog {
 	double mean;
 	double variance;
 	double standardDeviation;
+	int level;
 	int flag = 0;
 
 	public MeasureLog(String tradeCode) {
