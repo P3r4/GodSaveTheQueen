@@ -25,8 +25,8 @@ public class BovespaLog {
 		this.setFactor(logTxt);
 	}
 
-	public float getUnitaryOpeningPrice(){
-		return this.openingPrice/this.factor;
+	public float getOpeningPrice(){
+		return this.openingPrice;
 	}
 	
 	String logCode;

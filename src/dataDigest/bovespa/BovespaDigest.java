@@ -104,7 +104,7 @@ public class BovespaDigest {
 			line = tradeCode;
 			for (Integer logDay : logDayArray) {
 				if (bovespaShareMap.get(tradeCode).logDayMap.containsKey(logDay)) {
-					line += "," + bovespaShareMap.get(tradeCode).logDayMap.get(logDay).getUnitaryOpeningPrice();
+					line += "," + bovespaShareMap.get(tradeCode).logDayMap.get(logDay).getOpeningPrice();
 				} else {
 					line += ",null";
 				}

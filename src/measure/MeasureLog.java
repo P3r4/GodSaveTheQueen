@@ -8,14 +8,24 @@ public class MeasureLog {
 	
 	String tradeCode;
 	List<Double> log;
+	List<Double> returnLog;
 	double mean;
 	double variance;
 	double standardDeviation;
-	int level;
-	int flag = 0;
+	Integer level;
+	int flag;
 
+	
+	void calcReturn(){
+		Double t0Price = log.get(0) + 0.0000000000000001;
+		for(Double price : log){
+			returnLog.add((t0Price - price)/t0Price);
+		}
+	}
+	
 	public MeasureLog(String tradeCode) {
 		this.log = new ArrayList<>();
+		this.returnLog = new ArrayList<>();
 		this.tradeCode = tradeCode;
 		mean = 0;
 		variance = 0.000000000000001;
@@ -23,19 +33,19 @@ public class MeasureLog {
 
 	void calcMean() {
 		double out = 0;
-		for (Double xi : this.log) {
+		for (Double xi : this.returnLog) {
 			out += xi;
 		}
-		out /= log.size();
+		out /= returnLog.size();
 		mean = out;
 	}
 
 	void calcStdDeviationAndVariance() {
 		double out = 0;
-		for (Double xi : this.log) {
+		for (Double xi : this.returnLog) {
 			out += (xi - mean) * (xi - mean);
 		}
-		out /= (log.size() - 1);
+		out /= (returnLog.size() - 1);
 		variance += out;
 		standardDeviation = (float) Math.sqrt(variance);
 	}
@@ -62,10 +72,10 @@ public class MeasureLog {
 
 	public double calcCorrelation(MeasureLog other) {
 		double term1 = 0;
-		for (int i = 0; i < log.size(); i++) {
-			term1 += (this.log.get(i)-this.mean)*(other.log.get(i)-other.mean);
+		for (int i = 0; i < returnLog.size(); i++) {
+			term1 += (this.returnLog.get(i)-this.mean)*(other.returnLog.get(i)-other.mean);
 		}
-		double cov = term1/(log.size()-1);
+		double cov = term1/(returnLog.size()-1);
 		double x = cov/(this.standardDeviation*other.standardDeviation);
 		/*String k = x + "";
 		if(k.equals("NaN")){

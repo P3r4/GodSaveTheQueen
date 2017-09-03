@@ -5,18 +5,13 @@ import java.util.List;
 
 public class Vertex<C,R> {
 
-	Integer seqId;
 	C content;
 	List<Edge<C,R>> edgeList;
 	
-	public Vertex(C content, int seqId){
+	public Vertex(C content){
 		this.content = content;
 		edgeList =  new ArrayList<>();
-		this.seqId = seqId;
-	}
-	
-	public Integer getSeqId(){
-		return this.seqId;
+		
 	}
 	
 	public C getContent(){

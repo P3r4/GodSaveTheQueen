@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Graph<C,R> {
 
-	int seqId;
 	List<Vertex<C,R>> vertexAdjList;
 	List<Edge<C,R>> edgeList;
 	
@@ -14,7 +13,6 @@ public class Graph<C,R> {
 	}
 	
 	public Graph(){
-		seqId = 0;
 		vertexAdjList = new ArrayList<>();
 		edgeList = new ArrayList<>();
 	}
@@ -28,8 +26,7 @@ public class Graph<C,R> {
 	}
 	
 	public void addContent(C c){
-		vertexAdjList.add(new Vertex<C, R>(c, this.seqId));
-		this.seqId++;
+		vertexAdjList.add(new Vertex<C, R>(c));
 	}
 	
 	public void addRelation(int i, int j, R relation){
