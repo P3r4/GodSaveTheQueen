@@ -48,7 +48,7 @@ public class BovespaDigest {
 	private void initFlags() {
 		marketCodeList = new ArrayList<>();
 		marketCodeList.add("010");
-		marketCodeList.add("020");
+		//marketCodeList.add("020");
 		size = 200;
 	}
 

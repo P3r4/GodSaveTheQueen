@@ -75,7 +75,7 @@ public class MeasureGraph {
 	}
 
 	public void writeCorrCSVFile(String fileName, double limit) throws IOException {
-		int qtt = markEdges(limit);
+		int qtt = markGraph(limit);
 		PrintWriter writer = new PrintWriter(fileName);
 
 		for (int i = -1; i < qtt; i++) {
@@ -115,8 +115,8 @@ public class MeasureGraph {
 
 		}
 	}
-	
-	public Comparator<Vertex<MeasureLog, MeasureLink>> getLevelAscComparator(){
+
+	public Comparator<Vertex<MeasureLog, MeasureLink>> getLevelAscComparator() {
 		return new Comparator<Vertex<MeasureLog, MeasureLink>>() {
 			@Override
 			public int compare(Vertex<MeasureLog, MeasureLink> o1, Vertex<MeasureLog, MeasureLink> o2) {
@@ -124,8 +124,8 @@ public class MeasureGraph {
 			}
 		};
 	}
-	
-	public Comparator<Vertex<MeasureLog, MeasureLink>> getLevelDescComparator(){
+
+	public Comparator<Vertex<MeasureLog, MeasureLink>> getLevelDescComparator() {
 		return new Comparator<Vertex<MeasureLog, MeasureLink>>() {
 			@Override
 			public int compare(Vertex<MeasureLog, MeasureLink> o1, Vertex<MeasureLog, MeasureLink> o2) {
@@ -134,7 +134,16 @@ public class MeasureGraph {
 		};
 	}
 
-	public int markEdges(double limit) {
+	public int markGraph(double limit) {
+		double meanDownLimit = 0.0;
+		double varianceUpLimit = 0.6;
+		
+		for (Vertex<MeasureLog, MeasureLink> vertex : graph.getVertexList()) {
+			if (vertex.getContent().mean < meanDownLimit && vertex.getContent().variance > varianceUpLimit) {
+				vertex.getContent().flag = -1;
+			}
+		}
+
 		for (Edge<MeasureLog, MeasureLink> edge : this.graph.getEdgeList()) {
 			if (edge.getRelation().correlation > limit) {
 				edge.getRelation().flag = -1;
@@ -142,46 +151,50 @@ public class MeasureGraph {
 		}
 
 		countLevelForAll();
-		PriorityQueue<Vertex<MeasureLog, MeasureLink>> sortedByLevelQ = new PriorityQueue<>(this.getLevelDescComparator());
+		PriorityQueue<Vertex<MeasureLog, MeasureLink>> sortedByLevelQ = new PriorityQueue<>(
+				this.getLevelDescComparator());
 
-		
 		for (Vertex<MeasureLog, MeasureLink> v : graph.getVertexList()) {
 			sortedByLevelQ.add(v);
 		}
-		
+
 		PriorityQueue<Vertex<MeasureLog, MeasureLink>> sortedAdjQ;
 		ArrayDeque<Vertex<MeasureLog, MeasureLink>> mainQ = new ArrayDeque<>();
-		
+
 		int mark = 0;
 		int qtt = 0;
 		Vertex<MeasureLog, MeasureLink> marked, sortedVertex, sortedAdjVertex;
-		while(!sortedByLevelQ.isEmpty()){
-        	sortedVertex = sortedByLevelQ.poll();
-        	if (sortedVertex.getContent().flag == 0) {
+		System.out.println(graph.getVertexList().size());
+		while (!sortedByLevelQ.isEmpty()) {
+			sortedVertex = sortedByLevelQ.poll();
+			if (sortedVertex.getContent().flag == 0) {
+				System.out
+						.println( sortedVertex.getContent().tradeCode +">>>>>>>>>" + sortedVertex.getContent().level + " " + sortedVertex.getContent().mean+ " " + sortedVertex.getContent().variance);
 				mark++;
 				qtt = 20;
 				sortedVertex.getContent().flag = mark;
 				mainQ.add(sortedVertex);
-		    }
+			}
 			while (!mainQ.isEmpty()) {
 				marked = mainQ.poll();
 				sortedAdjQ = new PriorityQueue<>(this.getLevelDescComparator());
-				
-				for(Edge<MeasureLog, MeasureLink> edge : marked.getEdgeList()){
+
+				for (Edge<MeasureLog, MeasureLink> edge : marked.getEdgeList()) {
 					if (edge.getRelation().flag != -1 && edge.getVertexB().getContent().flag == 0) {
 						sortedAdjQ.add(edge.getVertexB());
 					}
 				}
-				
-				while( qtt>0  && !sortedAdjQ.isEmpty()){
+
+				while (qtt > 0 && !sortedAdjQ.isEmpty()) {
 					sortedAdjVertex = sortedAdjQ.poll();
+					System.out.println(sortedAdjVertex.getContent().tradeCode+" "+sortedAdjVertex.getContent().level + " " + sortedAdjVertex.getContent().mean+ " " + sortedAdjVertex.getContent().variance);
 					sortedAdjVertex.getContent().flag = mark;
 					mainQ.add(sortedAdjVertex);
 					qtt--;
 				}
 			}
 
-        }
+		}
 
 		return mark + 1;
 	}
