@@ -13,7 +13,7 @@ public class TestMeasureGraph {
 	@Test
 	public void test1() throws IOException{
 		MeasureGraph builder = new MeasureGraph("./samples/digestedCSV/digestedBovespa2011k.csv");
-		builder.writeCorrCSVFile("./samples/corrCSV/corrBovespa2011k.csv", -0.6);
+		builder.writeFilteredGraphCSVFile("./samples/corrCSV/corrBovespa2011k.csv", -0.6);
 	}
 	
 }

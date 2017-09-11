@@ -5,7 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import graph.*;
@@ -13,44 +15,31 @@ import graph.*;
 public class MeasureGraph {
 
 	Graph<MeasureLog, MeasureLink> graph;
+	List<Integer> dayList;
 	String fileName;
 
 	public MeasureGraph(String fileName) throws IOException {
 		init(fileName);
-		CalcMeasures();
 		CalcCorrelationForAll();
 	}
 
 	private void init(String fileName) throws IOException {
 		graph = new Graph<>();
+		dayList = new ArrayList<>();
 		this.fileName = fileName;
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
 		String[] splitLine = line.split(",");
+		for (int i = 1; i < splitLine.length; i++) {
+			dayList.add(Integer.parseInt(splitLine[i]));
+		}
 
-		MeasureLog row;
+		MeasureLog log;
 		while ((line = reader.readLine()) != null) {
-			splitLine = line.split(",");
-			row = new MeasureLog(splitLine[0]);
-			for (int i = 1; i < splitLine.length; i++) {
-				if (splitLine[i].equals("null")) {
-					row.log.add(null);
-				} else {
-					row.log.add(Double.parseDouble(splitLine[i]));
-				}
-			}
-			graph.addContent(row);
+			log = new MeasureLog(line);
+			graph.addContent(log);
 		}
 		reader.close();
-	}
-
-	private void CalcMeasures() {
-		for (Vertex<MeasureLog, MeasureLink> l : graph.getVertexList()) {
-			l.getContent().solveNull();
-			l.getContent().calcReturn();
-			l.getContent().calcMean();
-			l.getContent().calcStdDeviationAndVariance();
-		}
 	}
 
 	private void CalcCorrelationForAll() {
@@ -74,30 +63,31 @@ public class MeasureGraph {
 		}
 	}
 
-	public void writeCorrCSVFile(String fileName, double limit) throws IOException {
+	public void writeFilteredGraphCSVFile(String fileName, double limit) throws IOException {
 		int qtt = markGraph(limit);
 		PrintWriter writer = new PrintWriter(fileName);
 
+		List<Edge<MeasureLog, MeasureLink>> edgeList;
+
 		for (int i = -1; i < qtt; i++) {
+			edgeList = new ArrayList<>();
 			writer.println("#vertexList: " + i);
 			for (Vertex<MeasureLog, MeasureLink> vertex : this.graph.getVertexList()) {
 				if (vertex.getContent().flag == i) {
-					writer.println(vertex.getContent().tradeCode);
+					writer.println(vertex.getContent().toString());
+					for (Edge<MeasureLog, MeasureLink> edge : vertex.getEdgeList()) {
+						if (edge.getVertexB().getContent().flag == i) {
+							edgeList.add(edge);
+						}
+					}
 				}
 			}
-		}
-
-		for (int i = -1; i < qtt; i++) {
-
 			writer.println("#edgeList: " + i);
-			for (Edge<MeasureLog, MeasureLink> edge : this.graph.getEdgeList()) {
-				if (edge.getRelation().flag == i) {
-					writer.println(edge.getVertexA().getContent().tradeCode + ","
-							+ edge.getVertexB().getContent().tradeCode + "," + edge.getRelation().correlation);
-				}
+			for (Edge<MeasureLog, MeasureLink> edge : edgeList) {
+				writer.println(edge.getVertexA().getContent().tradeCode + "," + edge.getVertexB().getContent().tradeCode
+						+ "," + edge.getRelation().correlation);
 			}
 		}
-
 		writer.close();
 	}
 
@@ -107,7 +97,7 @@ public class MeasureGraph {
 		for (Vertex<MeasureLog, MeasureLink> v : graph.getVertexList()) {
 			count = 0;
 			for (Edge<MeasureLog, MeasureLink> edge : v.getEdgeList()) {
-				if (edge.getRelation().flag != -1) {
+				if (edge.getRelation().flag != -1 && edge.getVertexB().getContent().flag != -1) {
 					count++;
 				}
 			}
@@ -137,7 +127,8 @@ public class MeasureGraph {
 	public int markGraph(double limit) {
 		double meanDownLimit = 0.0;
 		double varianceUpLimit = 0.6;
-		
+		int initialQtt = 20;
+
 		for (Vertex<MeasureLog, MeasureLink> vertex : graph.getVertexList()) {
 			if (vertex.getContent().mean < meanDownLimit && vertex.getContent().variance > varianceUpLimit) {
 				vertex.getContent().flag = -1;
@@ -164,14 +155,11 @@ public class MeasureGraph {
 		int mark = 0;
 		int qtt = 0;
 		Vertex<MeasureLog, MeasureLink> marked, sortedVertex, sortedAdjVertex;
-		System.out.println(graph.getVertexList().size());
 		while (!sortedByLevelQ.isEmpty()) {
 			sortedVertex = sortedByLevelQ.poll();
 			if (sortedVertex.getContent().flag == 0) {
-				System.out
-						.println( sortedVertex.getContent().tradeCode +">>>>>>>>>" + sortedVertex.getContent().level + " " + sortedVertex.getContent().mean+ " " + sortedVertex.getContent().variance);
 				mark++;
-				qtt = 20;
+				qtt = initialQtt;
 				sortedVertex.getContent().flag = mark;
 				mainQ.add(sortedVertex);
 			}
@@ -187,7 +175,6 @@ public class MeasureGraph {
 
 				while (qtt > 0 && !sortedAdjQ.isEmpty()) {
 					sortedAdjVertex = sortedAdjQ.poll();
-					System.out.println(sortedAdjVertex.getContent().tradeCode+" "+sortedAdjVertex.getContent().level + " " + sortedAdjVertex.getContent().mean+ " " + sortedAdjVertex.getContent().variance);
 					sortedAdjVertex.getContent().flag = mark;
 					mainQ.add(sortedAdjVertex);
 					qtt--;

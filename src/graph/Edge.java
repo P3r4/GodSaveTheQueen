@@ -5,7 +5,7 @@ public class Edge<C,R> {
 	Vertex<C,R> a;
 	Vertex<C,R> b;
 	R relation;
-    
+	
 	public Edge(Vertex<C,R> a, Vertex<C,R> b, R relation){
 		this.relation = relation;
 		this.a = a;

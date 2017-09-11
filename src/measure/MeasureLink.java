@@ -10,4 +10,5 @@ public class MeasureLink {
 		flag = 0;
 		this.correlation = corr;
 	}
+	
 }
