@@ -2,7 +2,6 @@ package dataDigest.bovespa;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class BovespaShare {
 

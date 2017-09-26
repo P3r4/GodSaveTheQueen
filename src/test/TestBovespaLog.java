@@ -2,8 +2,6 @@ package test;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import dataDigest.bovespa.BovespaDigest;
 import dataDigest.bovespa.BovespaLog;
 
 public class TestBovespaLog {

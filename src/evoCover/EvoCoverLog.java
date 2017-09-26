@@ -1,13 +1,13 @@
-package measure;
+package evoCover;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MeasureLog {
+public class EvoCoverLog {
 
 	String tradeCode;
-	List<Double> log;
+	List<Double> priceLog;
 	List<Double> returnLog;
 	double mean;
 	double variance;
@@ -16,25 +16,25 @@ public class MeasureLog {
 	int flag;
 
 	private void calcReturnLog() {
-		Double t0Price = log.get(0) + 0.0000000000000001;
-		for (Double price : log) {
+		Double t0Price = priceLog.get(0) + 0.0000000000000001;
+		for (Double price : priceLog) {
 			returnLog.add((price - t0Price) / t0Price);
 		}
 	}
 
-	public MeasureLog(String line) {
+	public EvoCoverLog(String line) {
 		mean = 0;
 		variance = 0.000000000000001;		
-		this.log = new ArrayList<>();
+		this.priceLog = new ArrayList<>();
 		this.returnLog = new ArrayList<>();
 		String[] splitLine = line.split(",");
 		this.tradeCode = splitLine[0];
 		
 		for (int i = 1; i < splitLine.length; i++) {
 			if (splitLine[i].equals("null")) {
-				log.add(null);
+				priceLog.add(null);
 			} else {
-				log.add(Double.parseDouble(splitLine[i]));
+				priceLog.add(Double.parseDouble(splitLine[i]));
 			}
 		}
 		solveNull();
@@ -64,26 +64,26 @@ public class MeasureLog {
 	}
 
 	private void solveNull() {
-
-		Double last = log.get(log.size() - 1);
-		for (int j = log.size() - 1; j > -1; j--) {
-			if (last != null && log.get(j) == null) {
-				log.set(j, last);
+		System.out.println(priceLog.size());
+		Double last = priceLog.get(priceLog.size() - 1);
+		for (int j = priceLog.size() - 1; j > -1; j--) {
+			if (last != null && priceLog.get(j) == null) {
+				priceLog.set(j, last);
 			}
-			last = log.get(j);
+			last = priceLog.get(j);
 
 		}
-		last = log.get(0);
-		for (int j = 0; j < log.size(); j++) {
-			if (last != null && log.get(j) == null) {
-				log.set(j, last);
+		last = priceLog.get(0);
+		for (int j = 0; j < priceLog.size(); j++) {
+			if (last != null && priceLog.get(j) == null) {
+				priceLog.set(j, last);
 			}
-			last = log.get(j);
+			last = priceLog.get(j);
 		}
 
 	}
 
-	public double calcCorrelation(MeasureLog other) {
+	public double calcCorrelation(EvoCoverLog other) {
 		double term1 = 0;
 		for (int i = 0; i < returnLog.size(); i++) {
 			term1 += (this.returnLog.get(i) - this.mean) * (other.returnLog.get(i) - other.mean);
@@ -108,8 +108,12 @@ public class MeasureLog {
 	
 	@Override
 	public String toString() {
-		DecimalFormat df = new DecimalFormat("#0.0000000000");
-		return tradeCode + "," + df.format(mean) + "," + df.format(variance);
+		DecimalFormat df = new DecimalFormat("#0.00");
+		String line = "";
+		for(Double price : priceLog){
+			line += ","+df.format(price);
+		}
+		return tradeCode + line;
 	}
 
 }

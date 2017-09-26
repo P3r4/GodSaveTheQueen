@@ -3,7 +3,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import measure.MeasureLog;
+import evoCover.EvoCoverLog;
 
 public class TestMeasureLog {
 	
@@ -17,7 +17,7 @@ public class TestMeasureLog {
 		//http://www.investopedia.com/exam-guide/cfa-level-1/portfolio-management/portfolio-calculations.asp
 		
 		String line = "CPLE6,41.0,19.0,23.0,40.0,55.0,57.0,33.0";
-		MeasureLog log =  new MeasureLog(line);
+		EvoCoverLog log =  new EvoCoverLog(line);
 		
 		assertEquals(1, log.calcCorrelation(log),0.0001);
 		
@@ -26,7 +26,7 @@ public class TestMeasureLog {
 		assertEquals(0.3553266758,log.getStdDev(),0.0001);
 	
 		String line2 = "KBCX6,94.0,60.0,74.0,71.0,82.0,76.0,61.0";
-		MeasureLog other =  new MeasureLog(line2);
+		EvoCoverLog other =  new EvoCoverLog(line2);
 		
 		assertEquals(1, other.calcCorrelation(other),0.0001);
 		assertEquals(-0.2127659574,other.getMean(),0.0001);
