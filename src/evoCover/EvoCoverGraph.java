@@ -32,6 +32,10 @@ public class EvoCoverGraph {
 		initAllRelations();
 	}
 
+	public List<EvoCoverPortfolio> getSolutionList() {
+		return solutionList;
+	}
+
 	public void markGraph(double corrTLimit, double meanBLimit, double semiVarTLimit) {
 
 		for (Vertex<EvoCoverLog, EvoCoverLink> vertex : graph.getVertexList()) {
@@ -72,48 +76,126 @@ public class EvoCoverGraph {
 		}
 	}
 
+	public List<Vertex<EvoCoverLog, EvoCoverLink>> getVertexList() {
+		return graph.getVertexList();
+	}
+
 	public void randomInit() {
 		for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
-				EvoCoverLink link = e.getRelation();
-				for (int i = 0; i < solutionQtt; i++) {
-					link.coverList.add(new Random().nextDouble());
-				}
+			EvoCoverLink link = e.getRelation();
+			for (int i = 0; i < solutionQtt; i++) {
+				link.coverList.add(new Random().nextDouble());
+			}
 		}
-		normalize();
+		normalizeAll();
 	}
 
-	private void normalize() {
+	public void normalize(int solutionId) {
 		double total, normCover;
+		total = 0;
+		for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+			EvoCoverLink link = e.getRelation();
+			total += link.coverList.get(solutionId);
+		}
+		for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+			EvoCoverLink link = e.getRelation();
+			normCover = link.coverList.get(solutionId) / total;
+			link.coverList.set(solutionId, normCover);
+		}
+	}
+
+	public void normalizeAll() {
 		for (EvoCoverPortfolio p : solutionList) {
-			total = 0;
+			normalize(p.id);
+		}
+	}
+
+	public void maxAndMin() {
+		double w;
+		for (EvoCoverPortfolio p : solutionList) {
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
-				EvoCoverLink link = e.getRelation();
-				total += link.coverList.get(p.id);
-			}
-			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
-				EvoCoverLink link = e.getRelation();
-				normCover = link.coverList.get(p.id) / total;
-				link.coverList.set(p.id, normCover);
+				w = e.getRelation().coverList.get(p.id);
+				if (p.maxW < w)
+					p.maxW = w;
+				if (p.minW > w)
+					p.minW = w;
 			}
 		}
 	}
 
-	public void calcMeanReturnForAllSolutions() {
-		double term, weight, totalCheck;
-		DecimalFormat df = new DecimalFormat("#0.0000000000");
+	// [10]
+	public void geneticMutation3() {
+		maxAndMin();
+		double rand, deltaQ, delta, cover, newCover;
+		double chance = 1 / (graph.getEdgeList().size());
+		int i;
 		for (EvoCoverPortfolio p : solutionList) {
-			//System.out.println("solution-" + p.id);
+			i = 0;
+			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
+				if (new Random().nextDouble() < chance) {
+					rand = new Random().nextDouble();
+					cover = e1.getRelation().coverList.get(p.id);
+					if (rand <= 0.5) {
+						delta = (cover - p.minW) / (p.maxW - p.minW);
+						deltaQ = Math.pow(2 * rand + (1 - 2 * rand) * Math.pow((1 - delta), i + 1), 1 / (i + 1)) - 1;
+					} else {
+						delta = (p.maxW - cover) / (p.maxW - p.minW);
+						deltaQ = 1 - Math.pow(2 * (1 - rand) + 2 * (rand - 0.5) * Math.pow((1 - delta), i + 1),
+								1 / (i + 1));
+					}
+					newCover = cover + deltaQ * (p.maxW - p.minW);
+				}
+				i++;
+			}
+		}
+	}
+
+	// [15]
+	public void geneticMutation1() {
+		double tradeE1, tradeE2;
+		int e2Id;
+		double chance = 1 / (graph.getEdgeList().size());
+		for (EvoCoverPortfolio p : solutionList) {
+			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
+				if (new Random().nextDouble() < chance) {
+					tradeE1 = e1.getRelation().coverList.get(p.id);
+					e2Id = new Random().nextInt(graph.getEdgeList().size());
+					tradeE2 = graph.getEdgeList().get(e2Id).getRelation().coverList.get(p.id);
+					e1.getRelation().coverList.set(p.id, tradeE2);
+					graph.getEdgeList().get(e2Id).getRelation().coverList.set(p.id, tradeE1);
+				}
+			}
+		}
+	}
+
+	// [16]
+	public void geneticMutation2(double chance) {
+		double newCover;
+		for (EvoCoverPortfolio p : solutionList) {
+			if (new Random().nextDouble() < chance) {
+				for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+					newCover = e.getRelation().coverList.get(p.id) * (new Random().nextDouble()) * 2;
+					e.getRelation().coverList.set(p.id, newCover);
+				}
+
+			}
+			normalize(p.id);
+		}
+	}
+
+	public void calcMeanReturnForAll() {
+		double term, weight;
+		for (EvoCoverPortfolio p : solutionList) {
+			// System.out.println("solution-" + p.id);
 			term = 0;
-			totalCheck = 0;
 
 			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
-					totalCheck += e.getRelation().coverList.get(p.id);
 				}
 
-				//System.out.println(df.format(v.getContent().mean * weight));
+				// System.out.println(df.format(v.getContent().mean * weight));
 				term += (v.getContent().mean * weight);
 			}
 
@@ -146,13 +228,13 @@ public class EvoCoverGraph {
 		int qtt = divideGraph(corrTLimit, meanBLimit, semiVarTLimit);
 		PrintWriter writer;
 		int k;
-		String text,head;
+		String text, head;
 		head = "tradeCode";
 		for (Integer day : dayList) {
 			head += "," + day;
 		}
 		for (int i = -1; i < qtt; i++) {
-			text = head+"\n";
+			text = head + "\n";
 			k = 0;
 			for (Vertex<EvoCoverLog, EvoCoverLink> vertex : this.graph.getVertexList()) {
 				if (vertex.getContent().flag == i) {
@@ -161,7 +243,7 @@ public class EvoCoverGraph {
 					text += "\n";
 				}
 			}
-			
+
 			if (k > 7) {
 				writer = new PrintWriter(dirName + "part" + i + ".csv");
 				writer.print(text);

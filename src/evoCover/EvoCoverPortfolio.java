@@ -6,11 +6,17 @@ public class EvoCoverPortfolio {
 	double semiVar;
 	double skewness;
 	double sortinoRatio;
-	double totalWeight;
+	double maxW;
+	double minW;
 	
 	public EvoCoverPortfolio(int id){
 		this.id = id;
-		totalWeight = 0;
+		maxW = 0;
+		minW = 10;
+	}
+	
+	public int getId(){
+		return id;
 	}
 	
 }

@@ -28,7 +28,9 @@ public class TestBovespaDigest {
 	    	assertTrue(code.compareTo(lastS)>=0);
 	    }
 	    
-		String path = "./samples/digestedCSV/digestedBovespa2011k.csv";
+	    
+	    
+		String path = "./samples/digestedCSV/teste123.csv";
 		File f = new File(path);
 		f.delete();
 		digest.writeDigestedCSVFile(path);

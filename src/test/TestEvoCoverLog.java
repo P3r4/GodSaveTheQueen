@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import evoCover.EvoCoverLog;
 
-public class TestMeasureLog {
+public class TestEvoCoverLog {
 	
 	
 	@Test

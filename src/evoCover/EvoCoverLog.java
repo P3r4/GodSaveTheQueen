@@ -64,7 +64,6 @@ public class EvoCoverLog {
 	}
 
 	private void solveNull() {
-		System.out.println(priceLog.size());
 		Double last = priceLog.get(priceLog.size() - 1);
 		for (int j = priceLog.size() - 1; j > -1; j--) {
 			if (last != null && priceLog.get(j) == null) {

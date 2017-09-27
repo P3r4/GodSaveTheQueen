@@ -18,4 +18,8 @@ public class EvoCoverLink {
 		this.correlation = corr;
 	}
 	
+	public double getCoverValue(int solutionId){
+		return coverList.get(solutionId);
+	}
+	
 }
