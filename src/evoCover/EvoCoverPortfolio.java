@@ -2,10 +2,10 @@ package evoCover;
 
 public class EvoCoverPortfolio {
 	int id;
-	double mean;
-	double semiVar;
-	double skewness;
-	double sortinoRatio;
+	Double mean;
+	Double semiVar;
+	Double skewness;
+	Double sortinoRatio;
 	double maxW;
 	double minW;
 	

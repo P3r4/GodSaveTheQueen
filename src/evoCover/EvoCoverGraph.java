@@ -123,16 +123,111 @@ public class EvoCoverGraph {
 		}
 	}
 
+	public Comparator<EvoCoverPortfolio> getMeanComparator() {
+		return new Comparator<EvoCoverPortfolio>() {
+			@Override
+			public int compare(EvoCoverPortfolio o1, EvoCoverPortfolio o2) {
+				return o2.mean.compareTo(o1.mean);
+			}
+		};
+	}
+
+	public EvoCoverPortfolio meanLottery(List<EvoCoverPortfolio> rankedList) {
+		double rankTotal = 0;
+		for (EvoCoverPortfolio p : rankedList) {
+			rankTotal += Math.abs(p.mean);
+		}
+		EvoCoverPortfolio p;
+		double limit = Math.abs((new Random().nextDouble()) * rankTotal);
+		double part = 0;
+		int i = 0;
+		do {
+			p = rankedList.get(i);
+			part += Math.abs(p.mean);
+			i++;
+		} while ((i < rankedList.size()) && (part < limit));
+		System.out.println(limit + " " + i + " " + part);
+		return p;
+	}
+
+	public List<EvoCoverPortfolio> getRankedList(List<EvoCoverPortfolio> solutionList,
+			Comparator<EvoCoverPortfolio> comp) {
+		PriorityQueue<EvoCoverPortfolio> rankQ = new PriorityQueue<>(comp);
+		for (EvoCoverPortfolio p : solutionList) {
+			rankQ.add(p);
+		}
+		EvoCoverPortfolio p;
+		List<EvoCoverPortfolio> rankedList = new ArrayList<>();
+		while (!rankQ.isEmpty()) {
+			p = rankQ.poll();
+			rankedList.add(p);
+		}
+		return rankedList;
+	}
+
 	// [10]
-	public void geneticMutation3() {
+	public void crossOver2(int coupleQtt){
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
+		EvoCoverPortfolio solution1, solution2;
+		int id, i = 0;
+		double cover1,cover2,rand, beta;
+		while(i<coupleQtt){
+			i++;
+			solution1 = meanLottery(rankedList);		
+			solution2 = meanLottery(rankedList);	
+			rand = new Random().nextDouble();
+			id = graph.getEdgeList().get(0).getRelation().coverList.size();
+			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+				cover1 = e.getRelation().coverList.get(solution1.id);
+				cover2 = e.getRelation().coverList.get(solution2.id);
+				if(rand <= 0.5) beta = Math.pow(2*rand, 1/(1+graph.getEdgeList().size()));
+				else beta = Math.pow(1/(2*(1-rand)),1/(1+graph.getEdgeList().size()));
+				e.getRelation().coverList.add((cover1*(1+beta)+cover2*(1-beta))/2);
+				e.getRelation().coverList.add((cover1*(1-beta)+cover2*(1+beta))/2);
+			}
+			solutionList.add(new EvoCoverPortfolio(id));
+			solutionList.add(new EvoCoverPortfolio(id+1));
+			normalize(id);
+			normalize(id+1);
+		}
+	}
+
+	// [16]
+	public void crossOver1(int coupleQtt) {
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
+		EvoCoverPortfolio solution1, solution2;
+		int id, i = 0;
+		double c1, c2, rand;
+		while (i < coupleQtt) {
+			i++;
+			solution1 = meanLottery(rankedList);
+			solution2 = meanLottery(rankedList);
+			rand = new Random().nextDouble();
+			id = graph.getEdgeList().get(0).getRelation().coverList.size();
+			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+				c1 = e.getRelation().coverList.get(solution1.id);
+				c2 = e.getRelation().coverList.get(solution2.id);
+				e.getRelation().coverList.add(rand * c1 + (1 - rand) * c2);
+				e.getRelation().coverList.add(rand * c2 + (1 - rand) * c1);
+			}
+			solutionList.add(new EvoCoverPortfolio(id));
+			solutionList.add(new EvoCoverPortfolio(id + 1));
+			normalize(id);
+			normalize(id + 1);
+		}
+	}
+
+	// [10]
+	public void mutation3() {
 		maxAndMin();
 		double rand, deltaQ, delta, cover, newCover;
-		double chance = 1 / (graph.getEdgeList().size());
+		double chance = 1.0 / graph.getEdgeList().size();
 		int i;
 		for (EvoCoverPortfolio p : solutionList) {
 			i = 0;
 			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
+					// System.out.println("mutation3");
 					rand = new Random().nextDouble();
 					cover = e1.getRelation().coverList.get(p.id);
 					if (rand <= 0.5) {
@@ -144,17 +239,21 @@ public class EvoCoverGraph {
 								1 / (i + 1));
 					}
 					newCover = cover + deltaQ * (p.maxW - p.minW);
+					e1.getRelation().coverList.set(p.id, newCover);
+
 				}
 				i++;
 			}
+			normalize(p.id);
 		}
 	}
 
 	// [15]
-	public void geneticMutation1() {
+	public void mutation1() {
 		double tradeE1, tradeE2;
 		int e2Id;
-		double chance = 1 / (graph.getEdgeList().size());
+		double chance = 1.0 / graph.getEdgeList().size();
+		// System.out.print(1/graph.getEdgeList().size());
 		for (EvoCoverPortfolio p : solutionList) {
 			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
@@ -163,16 +262,18 @@ public class EvoCoverGraph {
 					tradeE2 = graph.getEdgeList().get(e2Id).getRelation().coverList.get(p.id);
 					e1.getRelation().coverList.set(p.id, tradeE2);
 					graph.getEdgeList().get(e2Id).getRelation().coverList.set(p.id, tradeE1);
+					// System.out.println("mutation1 "+tradeE1+" "+tradeE2);
 				}
 			}
 		}
 	}
 
 	// [16]
-	public void geneticMutation2(double chance) {
+	public void mutation2(double chance) {
 		double newCover;
 		for (EvoCoverPortfolio p : solutionList) {
 			if (new Random().nextDouble() < chance) {
+				// System.out.println("mutation2");
 				for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 					newCover = e.getRelation().coverList.get(p.id) * (new Random().nextDouble()) * 2;
 					e.getRelation().coverList.set(p.id, newCover);
@@ -200,7 +301,7 @@ public class EvoCoverGraph {
 			}
 
 			p.mean = term;
-			System.out.println(term);
+			// System.out.println(term);
 
 		}
 	}
@@ -287,7 +388,7 @@ public class EvoCoverGraph {
 
 	public int divideGraph(double corrTLimit, double meanBLimit, double semiVarTLimit) {
 		markGraph(corrTLimit, meanBLimit, semiVarTLimit);
-		int initialQtt = 20;
+		int initialQtt = 19;
 		countLevelForAll();
 		PriorityQueue<Vertex<EvoCoverLog, EvoCoverLink>> sortedByLevelQ = new PriorityQueue<>(
 				this.getLevelDescComparator());
