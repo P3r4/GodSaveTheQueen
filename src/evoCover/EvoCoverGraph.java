@@ -146,7 +146,6 @@ public class EvoCoverGraph {
 			part += Math.abs(p.mean);
 			i++;
 		} while ((i < rankedList.size()) && (part < limit));
-		System.out.println(limit + " " + i + " " + part);
 		return p;
 	}
 
@@ -191,7 +190,34 @@ public class EvoCoverGraph {
 			normalize(id+1);
 		}
 	}
-
+    //[20]
+	public void employedBeePhase1(){
+		double newCover;
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
+		EvoCoverPortfolio p2;
+		int bestId = rankedList.get(0).id;
+		double z;
+		int x,wtf;
+		for (EvoCoverPortfolio p1 : solutionList) {
+			x =0 ;
+			wtf = 0;
+			p2 = meanLottery(rankedList);
+			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+				newCover = e.getRelation().coverList.get(p1.id)
+				+ e.getRelation().correlation*(e.getRelation().coverList.get(p1.id)-e.getRelation().coverList.get(p2.id))
+			    + new Random().nextDouble()*(e.getRelation().coverList.get(bestId)-e.getRelation().coverList.get(p1.id));
+				z = Math.round(1/(1+Math.exp(-1*newCover)-e.getRelation().correlation));
+				if(z == 1.0){ 
+					e.getRelation().coverList.set(p1.id, newCover);
+					x++;
+				}
+				wtf++;
+			}
+			System.out.println("oi"+x+" "+wtf);
+		}
+		normalizeAll();
+	}
+	
 	// [16]
 	public void crossOver1(int coupleQtt) {
 		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
@@ -223,11 +249,11 @@ public class EvoCoverGraph {
 		double rand, deltaQ, delta, cover, newCover;
 		double chance = 1.0 / graph.getEdgeList().size();
 		int i;
+		DecimalFormat d = new DecimalFormat("#0.0000000");
 		for (EvoCoverPortfolio p : solutionList) {
 			i = 0;
 			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
-					// System.out.println("mutation3");
 					rand = new Random().nextDouble();
 					cover = e1.getRelation().coverList.get(p.id);
 					if (rand <= 0.5) {
@@ -253,7 +279,6 @@ public class EvoCoverGraph {
 		double tradeE1, tradeE2;
 		int e2Id;
 		double chance = 1.0 / graph.getEdgeList().size();
-		// System.out.print(1/graph.getEdgeList().size());
 		for (EvoCoverPortfolio p : solutionList) {
 			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
@@ -262,7 +287,6 @@ public class EvoCoverGraph {
 					tradeE2 = graph.getEdgeList().get(e2Id).getRelation().coverList.get(p.id);
 					e1.getRelation().coverList.set(p.id, tradeE2);
 					graph.getEdgeList().get(e2Id).getRelation().coverList.set(p.id, tradeE1);
-					// System.out.println("mutation1 "+tradeE1+" "+tradeE2);
 				}
 			}
 		}
@@ -273,7 +297,6 @@ public class EvoCoverGraph {
 		double newCover;
 		for (EvoCoverPortfolio p : solutionList) {
 			if (new Random().nextDouble() < chance) {
-				// System.out.println("mutation2");
 				for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 					newCover = e.getRelation().coverList.get(p.id) * (new Random().nextDouble()) * 2;
 					e.getRelation().coverList.set(p.id, newCover);
@@ -283,26 +306,61 @@ public class EvoCoverGraph {
 			normalize(p.id);
 		}
 	}
-
+	
+	
+	public void calcSemiVarAndSkewnessForAll(){
+		calcMeanReturnForAll();
+		double term, semiTerm, skewTerm, varTerm, weight;
+		List<Double> dayReturnList;
+		for (EvoCoverPortfolio p : solutionList) {
+			dayReturnList =  new ArrayList<>();
+		    for (int i = 0; i < dayList.size(); i++) {
+				dayReturnList.add(0.0);
+			}
+		    for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
+				weight = 0;
+				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+					weight += e.getRelation().coverList.get(p.id);
+				}
+				int t = 0 ;
+				for (Double r : v.getContent().returnLog){
+				    term = r * weight + dayReturnList.get(t);
+					dayReturnList.set(t, term);
+					t++;
+				}
+			}
+		    semiTerm = 0;
+		    skewTerm = 0;
+		    varTerm = 0;
+		    for(Double d : dayReturnList){
+		    	semiTerm += Math.min(0, (d-p.mean))*Math.min(0, (d-p.mean));
+		    	varTerm += (d-p.mean)*(d-p.mean);
+		    }
+		    p.semiVar = semiTerm/(dayReturnList.size()-1);
+		    varTerm /= (dayReturnList.size()-1);
+		    for(Double d : dayReturnList){
+		    	skewTerm += Math.pow((d-p.mean)/Math.pow(varTerm, 1/2), 3);
+		    }
+		    p.semiVar = semiTerm/(dayReturnList.size()-1);
+		    p.skewness = skewTerm/ (dayReturnList.size()-1);
+		    //System.out.println(p.semiVar);
+		    DecimalFormat f = new DecimalFormat("#0.0000000");
+		    //System.out.println(f.format(p.skewness));
+		}
+	}
+	
 	public void calcMeanReturnForAll() {
 		double term, weight;
 		for (EvoCoverPortfolio p : solutionList) {
-			// System.out.println("solution-" + p.id);
-			term = 0;
-
+		    term = 0;
 			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
 				}
-
-				// System.out.println(df.format(v.getContent().mean * weight));
 				term += (v.getContent().mean * weight);
 			}
-
 			p.mean = term;
-			// System.out.println(term);
-
 		}
 	}
 
