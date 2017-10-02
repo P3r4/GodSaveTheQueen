@@ -22,7 +22,7 @@ public class TestEvoCoverGraph {
 	public void testCrossOver2() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
-		graph.calcMeanReturnForAll();
+		graph.calcSemiVarAndSkewnessForAll();
 		graph.crossOver2(5);
 		assertEquals(20,graph.getSolutionList().size());
 
@@ -46,7 +46,7 @@ public class TestEvoCoverGraph {
 	public void testCrossOver1() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
-		graph.calcMeanReturnForAll();
+		graph.calcSemiVarAndSkewnessForAll();
 		graph.crossOver1(5);
 		assertEquals(20,graph.getSolutionList().size());
 
@@ -103,7 +103,6 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		assertNotEquals(p1, p2);
-	
 	}
 	
 	@Test

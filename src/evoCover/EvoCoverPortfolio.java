@@ -5,7 +5,6 @@ public class EvoCoverPortfolio {
 	Double mean;
 	Double semiVar;
 	Double skewness;
-	Double sortinoRatio;
 	double maxW;
 	double minW;
 	
@@ -18,5 +17,14 @@ public class EvoCoverPortfolio {
 	public int getId(){
 		return id;
 	}
+	
+	public double getHyperVolume(){
+		return mean*skewness/semiVar;
+	}
+	
+	public double getSortinoRatio(){
+		return mean/semiVar;
+	}
+	
 	
 }

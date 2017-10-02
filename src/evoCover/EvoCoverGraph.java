@@ -132,10 +132,10 @@ public class EvoCoverGraph {
 		};
 	}
 
-	public EvoCoverPortfolio meanLottery(List<EvoCoverPortfolio> rankedList) {
+	public EvoCoverPortfolio hyperVolumeLottery(List<EvoCoverPortfolio> rankedList) {
 		double rankTotal = 0;
 		for (EvoCoverPortfolio p : rankedList) {
-			rankTotal += Math.abs(p.mean);
+			rankTotal += Math.abs(p.getHyperVolume());
 		}
 		EvoCoverPortfolio p;
 		double limit = Math.abs((new Random().nextDouble()) * rankTotal);
@@ -143,7 +143,7 @@ public class EvoCoverGraph {
 		int i = 0;
 		do {
 			p = rankedList.get(i);
-			part += Math.abs(p.mean);
+			part += Math.abs(p.getHyperVolume());
 			i++;
 		} while ((i < rankedList.size()) && (part < limit));
 		return p;
@@ -172,8 +172,8 @@ public class EvoCoverGraph {
 		double cover1,cover2,rand, beta;
 		while(i<coupleQtt){
 			i++;
-			solution1 = meanLottery(rankedList);		
-			solution2 = meanLottery(rankedList);	
+			solution1 = hyperVolumeLottery(rankedList);		
+			solution2 = hyperVolumeLottery(rankedList);	
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
@@ -201,7 +201,7 @@ public class EvoCoverGraph {
 		for (EvoCoverPortfolio p1 : solutionList) {
 			x =0 ;
 			wtf = 0;
-			p2 = meanLottery(rankedList);
+			p2 = hyperVolumeLottery(rankedList);
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 				newCover = e.getRelation().coverList.get(p1.id)
 				+ e.getRelation().correlation*(e.getRelation().coverList.get(p1.id)-e.getRelation().coverList.get(p2.id))
@@ -226,8 +226,8 @@ public class EvoCoverGraph {
 		double c1, c2, rand;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = meanLottery(rankedList);
-			solution2 = meanLottery(rankedList);
+			solution1 = hyperVolumeLottery(rankedList);
+			solution2 = hyperVolumeLottery(rankedList);
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
