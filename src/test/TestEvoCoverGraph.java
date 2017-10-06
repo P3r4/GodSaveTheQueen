@@ -19,12 +19,12 @@ public class TestEvoCoverGraph {
 	
 	
 	@Test
-	public void testCrossOver2() throws IOException {
+	public void testCrossOver10() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
-		graph.crossOver2(5);
-		assertEquals(20,graph.getSolutionList().size());
+		graph.crossOver10(5);
+		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
 		for (EvoCoverPortfolio p : graph.getSolutionList()) {
@@ -38,17 +38,17 @@ public class TestEvoCoverGraph {
 			greatT += total;
 		}
 		
-		assertEquals(20.0,greatT,0.00000000001);
+		assertEquals(10.0,greatT,0.00000000001);
 		
 	}
 
 	@Test
-	public void testCrossOver1() throws IOException {
+	public void testCrossOver16() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
-		graph.crossOver1(5);
-		assertEquals(20,graph.getSolutionList().size());
+		graph.crossOver16(5);
+		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
 		for (EvoCoverPortfolio p : graph.getSolutionList()) {
@@ -62,12 +62,12 @@ public class TestEvoCoverGraph {
 			greatT += total;
 		}
 		
-		assertEquals(20.0,greatT,0.00000000001);
+		assertEquals(10.0,greatT,0.00000000001);
 		
 	}
 	
 	@Test
-	public void testEmpBee() throws IOException{
+	public void testEmpBee20() throws IOException{
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
@@ -87,7 +87,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		
-		graph.employedBeePhase1();
+		graph.employedBeePhase20( 0.06 , 1);
 			
 		greatT = 0;
 		for (EvoCoverPortfolio p : graph.getSolutionList()) {
@@ -106,7 +106,7 @@ public class TestEvoCoverGraph {
 	}
 	
 	@Test
-	public void testMutation1() throws IOException {
+	public void testMutation10() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcMeanReturnForAll();
@@ -125,7 +125,7 @@ public class TestEvoCoverGraph {
 			greatT += total;
 		}
 		assertEquals(10.0,greatT,0.00000000001);
-		graph.mutation1();
+		graph.mutation10();
 		
 		greatT = 0;
 		for (EvoCoverPortfolio p : graph.getSolutionList()) {
@@ -144,7 +144,7 @@ public class TestEvoCoverGraph {
 	}
 	
 	@Test
-	public void testMutation2() throws IOException {
+	public void testMutation16() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcMeanReturnForAll();
@@ -164,7 +164,7 @@ public class TestEvoCoverGraph {
 			greatT += total;
 		}
 		assertEquals(10.0,greatT,0.00000000001);
-		graph.mutation2(0.2);
+		graph.mutation16(0.2);
 		
 		greatT = 0;
 		for (EvoCoverPortfolio p : graph.getSolutionList()) {
@@ -183,7 +183,7 @@ public class TestEvoCoverGraph {
 	}
 	
 	@Test
-	public void testMutation3() throws IOException {
+	public void testMutation15() throws IOException {
 		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
@@ -202,7 +202,7 @@ public class TestEvoCoverGraph {
 			greatT += total;
 		}
 		assertEquals(10.0,greatT,0.00000000001);
-		graph.mutation3();
+		graph.mutation15();
 		
 		greatT = 0;
 		for (EvoCoverPortfolio p : graph.getSolutionList()) {

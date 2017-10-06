@@ -132,6 +132,16 @@ public class EvoCoverGraph {
 		};
 	}
 
+	public Comparator<EvoCoverPortfolio> getHyperVolumeComparator() {
+		return new Comparator<EvoCoverPortfolio>() {
+			@Override
+			public int compare(EvoCoverPortfolio o1, EvoCoverPortfolio o2) {
+				Double hv = o2.getHyperVolume();
+				return hv.compareTo(o1.getHyperVolume());
+			}
+		};
+	}
+
 	public EvoCoverPortfolio hyperVolumeLottery(List<EvoCoverPortfolio> rankedList) {
 		double rankTotal = 0;
 		for (EvoCoverPortfolio p : rankedList) {
@@ -164,63 +174,105 @@ public class EvoCoverGraph {
 		return rankedList;
 	}
 
+	// [20]
+	public void employedBeePhase20(double alfa, int c) {
+		double newCover;
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
+		EvoCoverPortfolio p2;
+		int bestId = rankedList.get(0).id;
+		double z;
+		for (EvoCoverPortfolio p1 : solutionList) {
+			p2 = hyperVolumeLottery(rankedList);
+			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+				newCover = e.getRelation().coverList.get(p1.id)
+						+ new Random().nextDouble()
+								* (e.getRelation().coverList.get(p1.id) - e.getRelation().coverList.get(p2.id))
+						+ new Random().nextInt(c + 1)
+								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
+				z = Math.round(1 / (1 + Math.exp(-1 * newCover) - alfa));
+				if (z == 1.0) {
+					e.getRelation().coverList.set(p1.id, newCover);
+				}
+			}
+			normalize(p1.id);
+		}
+	}
+
+	public void fixGraph(int coupleQtt) {
+		calcSemiVarAndSkewnessForAll();
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
+		swapCoverListValues(rankedList, buildSwapList(coupleQtt, rankedList));
+		solutionList = rankedList;
+		fixCoverListForAllEdges(coupleQtt);
+	}
+	
+	public List<EvoCoverPortfolio> buildSwapList(int coupleQtt, List<EvoCoverPortfolio> rankedList){
+		EvoCoverPortfolio p2;
+		List<EvoCoverPortfolio> swapList = new ArrayList<>();
+		for (int i = 0; i < coupleQtt * 2; i++) {
+			p2 = rankedList.remove(rankedList.size() - 1);
+			if (p2.id < solutionQtt) {
+				swapList.add(p2);
+			}
+		}
+		return swapList;
+	}
+
+	public void swapCoverListValues(List<EvoCoverPortfolio> rankedList, List<EvoCoverPortfolio> swapList) {
+		int k = 0;
+		for (EvoCoverPortfolio p : rankedList) {
+			if (p.id >= solutionQtt) {
+				System.out.println(p.id + " " + solutionQtt);
+				for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+					e.getRelation().coverList.set(swapList.get(k).id, e.getRelation().coverList.get(p.id));
+				}
+				p.id = swapList.get(k).id;
+				k++;
+			}
+		}
+	}
+
+	public void fixCoverListForAllEdges(int coupleQtt) {
+		for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+			for (int i = 0; i < coupleQtt * 2; i++) {
+				e.getRelation().coverList.remove(e.getRelation().coverList.size() - 1);
+			}
+		}
+	}
+
 	// [10]
-	public void crossOver2(int coupleQtt){
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
+	public void crossOver10(int coupleQtt) {
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
 		EvoCoverPortfolio solution1, solution2;
 		int id, i = 0;
-		double cover1,cover2,rand, beta;
-		while(i<coupleQtt){
+		double cover1, cover2, rand, beta;
+		while (i < coupleQtt) {
 			i++;
-			solution1 = hyperVolumeLottery(rankedList);		
-			solution2 = hyperVolumeLottery(rankedList);	
+			solution1 = hyperVolumeLottery(rankedList);
+			solution2 = hyperVolumeLottery(rankedList);
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 				cover1 = e.getRelation().coverList.get(solution1.id);
 				cover2 = e.getRelation().coverList.get(solution2.id);
-				if(rand <= 0.5) beta = Math.pow(2*rand, 1/(1+graph.getEdgeList().size()));
-				else beta = Math.pow(1/(2*(1-rand)),1/(1+graph.getEdgeList().size()));
-				e.getRelation().coverList.add((cover1*(1+beta)+cover2*(1-beta))/2);
-				e.getRelation().coverList.add((cover1*(1-beta)+cover2*(1+beta))/2);
+				if (rand <= 0.5)
+					beta = Math.pow(2 * rand, 1 / (1 + graph.getEdgeList().size()));
+				else
+					beta = Math.pow(1 / (2 * (1 - rand)), 1 / (1 + graph.getEdgeList().size()));
+				e.getRelation().coverList.add((cover1 * (1 + beta) + cover2 * (1 - beta)) / 2);
+				e.getRelation().coverList.add((cover1 * (1 - beta) + cover2 * (1 + beta)) / 2);
 			}
 			solutionList.add(new EvoCoverPortfolio(id));
-			solutionList.add(new EvoCoverPortfolio(id+1));
+			solutionList.add(new EvoCoverPortfolio(id + 1));
 			normalize(id);
-			normalize(id+1);
+			normalize(id + 1);
 		}
+		fixGraph(coupleQtt);
 	}
-    //[20]
-	public void employedBeePhase1(){
-		double newCover;
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
-		EvoCoverPortfolio p2;
-		int bestId = rankedList.get(0).id;
-		double z;
-		int x,wtf;
-		for (EvoCoverPortfolio p1 : solutionList) {
-			x =0 ;
-			wtf = 0;
-			p2 = hyperVolumeLottery(rankedList);
-			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
-				newCover = e.getRelation().coverList.get(p1.id)
-				+ e.getRelation().correlation*(e.getRelation().coverList.get(p1.id)-e.getRelation().coverList.get(p2.id))
-			    + new Random().nextDouble()*(e.getRelation().coverList.get(bestId)-e.getRelation().coverList.get(p1.id));
-				z = Math.round(1/(1+Math.exp(-1*newCover)-e.getRelation().correlation));
-				if(z == 1.0){ 
-					e.getRelation().coverList.set(p1.id, newCover);
-					x++;
-				}
-				wtf++;
-			}
-			System.out.println("oi"+x+" "+wtf);
-		}
-		normalizeAll();
-	}
-	
+
 	// [16]
-	public void crossOver1(int coupleQtt) {
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getMeanComparator());
+	public void crossOver16(int coupleQtt) {
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
 		EvoCoverPortfolio solution1, solution2;
 		int id, i = 0;
 		double c1, c2, rand;
@@ -241,10 +293,11 @@ public class EvoCoverGraph {
 			normalize(id);
 			normalize(id + 1);
 		}
+		fixGraph(coupleQtt);
 	}
 
 	// [10]
-	public void mutation3() {
+	public void mutation10() {
 		maxAndMin();
 		double rand, deltaQ, delta, cover, newCover;
 		double chance = 1.0 / graph.getEdgeList().size();
@@ -275,7 +328,7 @@ public class EvoCoverGraph {
 	}
 
 	// [15]
-	public void mutation1() {
+	public void mutation15() {
 		double tradeE1, tradeE2;
 		int e2Id;
 		double chance = 1.0 / graph.getEdgeList().size();
@@ -289,11 +342,12 @@ public class EvoCoverGraph {
 					graph.getEdgeList().get(e2Id).getRelation().coverList.set(p.id, tradeE1);
 				}
 			}
+			normalize(p.id);
 		}
 	}
 
 	// [16]
-	public void mutation2(double chance) {
+	public void mutation16(double chance) {
 		double newCover;
 		for (EvoCoverPortfolio p : solutionList) {
 			if (new Random().nextDouble() < chance) {
@@ -306,53 +360,52 @@ public class EvoCoverGraph {
 			normalize(p.id);
 		}
 	}
-	
-	
-	public void calcSemiVarAndSkewnessForAll(){
+
+	public void calcSemiVarAndSkewnessForAll() {
 		calcMeanReturnForAll();
 		double term, semiTerm, skewTerm, varTerm, weight;
 		List<Double> dayReturnList;
 		for (EvoCoverPortfolio p : solutionList) {
-			dayReturnList =  new ArrayList<>();
-		    for (int i = 0; i < dayList.size(); i++) {
+			dayReturnList = new ArrayList<>();
+			for (int i = 0; i < dayList.size(); i++) {
 				dayReturnList.add(0.0);
 			}
-		    for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
+			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
 				}
-				int t = 0 ;
-				for (Double r : v.getContent().returnLog){
-				    term = r * weight + dayReturnList.get(t);
+				int t = 0;
+				for (Double r : v.getContent().returnLog) {
+					term = r * weight + dayReturnList.get(t);
 					dayReturnList.set(t, term);
 					t++;
 				}
 			}
-		    semiTerm = 0;
-		    skewTerm = 0;
-		    varTerm = 0;
-		    for(Double d : dayReturnList){
-		    	semiTerm += Math.min(0, (d-p.mean))*Math.min(0, (d-p.mean));
-		    	varTerm += (d-p.mean)*(d-p.mean);
-		    }
-		    p.semiVar = semiTerm/(dayReturnList.size()-1);
-		    varTerm /= (dayReturnList.size()-1);
-		    for(Double d : dayReturnList){
-		    	skewTerm += Math.pow((d-p.mean)/Math.pow(varTerm, 1/2), 3);
-		    }
-		    p.semiVar = semiTerm/(dayReturnList.size()-1);
-		    p.skewness = skewTerm/ (dayReturnList.size()-1);
-		    //System.out.println(p.semiVar);
-		    DecimalFormat f = new DecimalFormat("#0.0000000");
-		    //System.out.println(f.format(p.skewness));
+			semiTerm = 0;
+			skewTerm = 0;
+			varTerm = 0;
+			for (Double d : dayReturnList) {
+				semiTerm += Math.min(0, (d - p.mean)) * Math.min(0, (d - p.mean));
+				varTerm += (d - p.mean) * (d - p.mean);
+			}
+			p.semiVar = semiTerm / (dayReturnList.size() - 1);
+			varTerm /= (dayReturnList.size() - 1);
+			for (Double d : dayReturnList) {
+				skewTerm += Math.pow((d - p.mean) / Math.pow(varTerm, 1 / 2), 3);
+			}
+			p.semiVar = semiTerm / (dayReturnList.size() - 1);
+			p.skewness = skewTerm / (dayReturnList.size() - 1);
+			// System.out.println(p.semiVar);
+			DecimalFormat f = new DecimalFormat("#0.0000000");
+			// System.out.println(f.format(p.skewness));
 		}
 	}
-	
+
 	public void calcMeanReturnForAll() {
 		double term, weight;
 		for (EvoCoverPortfolio p : solutionList) {
-		    term = 0;
+			term = 0;
 			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
