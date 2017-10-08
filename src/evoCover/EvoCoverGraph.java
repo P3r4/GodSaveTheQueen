@@ -1,6 +1,7 @@
 package evoCover;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,8 +23,8 @@ public class EvoCoverGraph {
 	String fileName;
 	int solutionQtt;
 
-	public EvoCoverGraph(int qtt, String fileName) throws IOException {
-		solutionQtt = qtt;
+	public EvoCoverGraph(int sqtt, String fileName) throws IOException {
+		solutionQtt = sqtt;
 		solutionList = new ArrayList<>();
 		for (int i = 0; i < solutionQtt; i++) {
 			solutionList.add(new EvoCoverPortfolio(i));
@@ -141,7 +142,7 @@ public class EvoCoverGraph {
 			}
 		};
 	}
-	
+
 	public Comparator<EvoCoverPortfolio> getFitComparator() {
 		return new Comparator<EvoCoverPortfolio>() {
 			@Override
@@ -168,7 +169,7 @@ public class EvoCoverGraph {
 		} while ((i < rankedList.size()) && (part < limit));
 		return p;
 	}
-	
+
 	public EvoCoverPortfolio hyperVolumeLottery(List<EvoCoverPortfolio> rankedList) {
 		double rankTotal = 0;
 		for (EvoCoverPortfolio p : rankedList) {
@@ -201,8 +202,7 @@ public class EvoCoverGraph {
 		return rankedList;
 	}
 
-	
-	//[20]
+	// [20]
 	public void onlookerBeePhase20(int onlQtt, int empQtt) {
 		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList.subList(0, empQtt), getHyperVolumeComparator());
 		EvoCoverPortfolio p;
@@ -214,17 +214,19 @@ public class EvoCoverGraph {
 			}
 		}
 	}
-	
-	public void scoutBeePhase20(int empQtt, int limit){
+
+	public void scoutBeePhase20(int empQtt, int limit) {
 		for (int i = 0; i < empQtt; i++) {
-			if(solutionList.get(i).trail > limit){
-				
+			if (solutionList.get(i).trail > limit) {
+				for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+					e.getRelation().coverList.add(new Random().nextDouble());
+				}
+				normalize(solutionList.get(i).id);
 			}
-		}	
-		
-		
+		}
+
 	}
-	
+
 	// [20]
 	public void employedBeePhase20(int empQtt, double alfa, int c) {
 		double newCover;
@@ -232,7 +234,7 @@ public class EvoCoverGraph {
 		EvoCoverPortfolio p1, p2;
 		int bestId = rankedList.get(0).id;
 		double z;
-		
+
 		for (int i = 0; i < empQtt; i++) {
 			p1 = solutionList.get(i);
 			p2 = hyperVolumeLottery(rankedList);
@@ -253,6 +255,26 @@ public class EvoCoverGraph {
 		}
 	}
 
+	public void printResult(String resultFile) throws FileNotFoundException {
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
+		double weight;
+		String text = "";
+		for (EvoCoverPortfolio p : rankedList) {
+			text += p.id;
+			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
+				weight =0;
+				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+					weight += e.getRelation().coverList.get(p.id);
+				}
+				text += ","+v.getContent().tradeCode+","+weight;
+			}
+			text += "\n";
+		}
+		PrintWriter writer = new PrintWriter(resultFile);
+		writer.print(text);
+		writer.close();
+	}
+
 	public void fixGraph(int coupleQtt) {
 		calcSemiVarAndSkewnessForAll();
 		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
@@ -260,8 +282,8 @@ public class EvoCoverGraph {
 		solutionList = rankedList;
 		fixCoverListForAllEdges(coupleQtt);
 	}
-	
-	public List<EvoCoverPortfolio> buildSwapList(int coupleQtt, List<EvoCoverPortfolio> rankedList){
+
+	public List<EvoCoverPortfolio> buildSwapList(int coupleQtt, List<EvoCoverPortfolio> rankedList) {
 		EvoCoverPortfolio p2;
 		List<EvoCoverPortfolio> swapList = new ArrayList<>();
 		for (int i = 0; i < coupleQtt * 2; i++) {
