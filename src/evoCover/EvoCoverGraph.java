@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
-
 import graph.*;
 
 public class EvoCoverGraph {
@@ -133,6 +132,15 @@ public class EvoCoverGraph {
 		};
 	}
 
+	public Comparator<EvoCoverPortfolio> getSemiVarComparator() {
+		return new Comparator<EvoCoverPortfolio>() {
+			@Override
+			public int compare(EvoCoverPortfolio o1, EvoCoverPortfolio o2) {
+				return o1.semiVar.compareTo(o2.semiVar);
+			}
+		};
+	}	
+	
 	public Comparator<EvoCoverPortfolio> getHyperVolumeComparator() {
 		return new Comparator<EvoCoverPortfolio>() {
 			@Override
@@ -153,62 +161,14 @@ public class EvoCoverGraph {
 		};
 	}
 
-	public EvoCoverPortfolio fitLottery(List<EvoCoverPortfolio> rankedList) {
-		double rankTotal = 0;
-		for (EvoCoverPortfolio p : rankedList) {
-			rankTotal += p.getFit();
-		}
-		EvoCoverPortfolio p;
-		double limit = Math.abs((new Random().nextDouble()) * rankTotal);
-		double part = 0;
-		int i = 0;
-		do {
-			p = rankedList.get(i);
-			part += p.getFit();
-			i++;
-		} while ((i < rankedList.size()) && (part < limit));
-		return p;
-	}
-
-	public EvoCoverPortfolio hyperVolumeLottery(List<EvoCoverPortfolio> rankedList) {
-		double rankTotal = 0;
-		for (EvoCoverPortfolio p : rankedList) {
-			rankTotal += p.getHyperVolume();
-		}
-		EvoCoverPortfolio p;
-		double limit = Math.abs((new Random().nextDouble()) * rankTotal);
-		double part = 0;
-		int i = 0;
-		do {
-			p = rankedList.get(i);
-			part += p.getHyperVolume();
-			i++;
-		} while ((i < rankedList.size()) && (part < limit));
-		return p;
-	}
-
-	public List<EvoCoverPortfolio> getRankedList(List<EvoCoverPortfolio> solutionList,
-			Comparator<EvoCoverPortfolio> comp) {
-		PriorityQueue<EvoCoverPortfolio> rankQ = new PriorityQueue<>(comp);
-		for (EvoCoverPortfolio p : solutionList) {
-			rankQ.add(p);
-		}
-		EvoCoverPortfolio p;
-		List<EvoCoverPortfolio> rankedList = new ArrayList<>();
-		while (!rankQ.isEmpty()) {
-			p = rankQ.poll();
-			rankedList.add(p);
-		}
-		return rankedList;
-	}
 
 	// [20]
 	public void onlookerBeePhase20(int onlQtt, int empQtt) {
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList.subList(0, empQtt), getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
 		EvoCoverPortfolio p;
 		int total = empQtt + onlQtt;
 		for (int i = empQtt; i < total; i++) {
-			p = fitLottery(rankedList);
+			p = rank.lottery(new HV());
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 				e.getRelation().coverList.set(i, e.getRelation().coverList.get(p.id));
 			}
@@ -230,14 +190,14 @@ public class EvoCoverGraph {
 	// [20]
 	public void employedBeePhase20(int empQtt, double alfa, int c) {
 		double newCover;
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList.subList(0, empQtt), getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
 		EvoCoverPortfolio p1, p2;
-		int bestId = rankedList.get(0).id;
+		int bestId = rank.getFirst().id;
 		double z;
 
 		for (int i = 0; i < empQtt; i++) {
 			p1 = solutionList.get(i);
-			p2 = hyperVolumeLottery(rankedList);
+			p2 = rank.lottery(new HV());
 			p1.trail++;
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 				newCover = e.getRelation().coverList.get(p1.id)
@@ -255,31 +215,42 @@ public class EvoCoverGraph {
 		}
 	}
 
-	public void printResult(String resultFile) throws FileNotFoundException {
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
+	public String formatResult(){
+		
+		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+		DecimalFormat df = new DecimalFormat("#0.000000");
 		double weight;
 		String text = "";
-		for (EvoCoverPortfolio p : rankedList) {
-			text += p.id;
+		for (EvoCoverPortfolio p : rank.rankedList) {
+			text += p.id+","+df.format(p.getHyperVolume())+","+df.format(p.mean)+","+df.format(p.semiVar)+","+df.format(p.skewness);
 			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
 				weight =0;
 				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
 				}
-				text += ","+v.getContent().tradeCode+","+weight;
+				text += ","+v.getContent().tradeCode+","+df.format(weight);
 			}
 			text += "\n";
 		}
+		return text;
+	}
+
+	public void printResult() {
+		System.out.print(formatResult());
+		System.out.println("------------");
+	}
+	
+	public void printResult(String resultFile) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(resultFile);
-		writer.print(text);
+		writer.print(formatResult());
 		writer.close();
 	}
 
 	public void fixGraph(int coupleQtt) {
 		calcSemiVarAndSkewnessForAll();
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
-		swapCoverListValues(rankedList, buildSwapList(coupleQtt, rankedList));
-		solutionList = rankedList;
+		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+		swapCoverListValues(rank.rankedList, buildSwapList(coupleQtt, rank.rankedList));
+		solutionList = rank.rankedList;
 		fixCoverListForAllEdges(coupleQtt);
 	}
 
@@ -299,7 +270,6 @@ public class EvoCoverGraph {
 		int k = 0;
 		for (EvoCoverPortfolio p : rankedList) {
 			if (p.id >= solutionQtt) {
-				System.out.println(p.id + " " + solutionQtt);
 				for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 					e.getRelation().coverList.set(swapList.get(k).id, e.getRelation().coverList.get(p.id));
 				}
@@ -319,14 +289,14 @@ public class EvoCoverGraph {
 
 	// [10]
 	public void crossOver10(int coupleQtt) {
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, getMeanComparator());
 		EvoCoverPortfolio solution1, solution2;
 		int id, i = 0;
 		double cover1, cover2, rand, beta;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = hyperVolumeLottery(rankedList);
-			solution2 = hyperVolumeLottery(rankedList);
+			solution1 = rank.lottery(new Mean());
+			solution2 = rank.lottery(new Mean());
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
@@ -349,14 +319,14 @@ public class EvoCoverGraph {
 
 	// [16]
 	public void crossOver16(int coupleQtt) {
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
 		EvoCoverPortfolio solution1, solution2;
 		int id, i = 0;
 		double c1, c2, rand;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = hyperVolumeLottery(rankedList);
-			solution2 = hyperVolumeLottery(rankedList);
+			solution1 = rank.lottery(new HV());
+			solution2 = rank.lottery(new HV());
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
@@ -379,7 +349,6 @@ public class EvoCoverGraph {
 		double rand, deltaQ, delta, cover, newCover;
 		double chance = 1.0 / graph.getEdgeList().size();
 		int i;
-		DecimalFormat d = new DecimalFormat("#0.0000000");
 		for (EvoCoverPortfolio p : solutionList) {
 			i = 0;
 			for (Edge<EvoCoverLog, EvoCoverLink> e1 : graph.getEdgeList()) {
@@ -473,9 +442,6 @@ public class EvoCoverGraph {
 			}
 			p.semiVar = semiTerm / (dayReturnList.size() - 1);
 			p.skewness = skewTerm / (dayReturnList.size() - 1);
-			// System.out.println(p.semiVar);
-			DecimalFormat f = new DecimalFormat("#0.0000000");
-			// System.out.println(f.format(p.skewness));
 		}
 	}
 

@@ -2,8 +2,7 @@ package evoCover;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class Evo {
 
@@ -41,9 +40,11 @@ public class Evo {
 	public void evo10(int genQtt) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
+			System.out.println("gen: "+i);
 			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver10(Math.floorDiv(solQtt, 2));
 			graph.mutation10();
+			graph.printResult();
 		}
 
 		graph.printResult(resultDir+"evo10result.csv");

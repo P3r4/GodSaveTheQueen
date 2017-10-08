@@ -1,13 +1,11 @@
 import java.io.IOException;
 
-import org.omg.PortableServer.POA;
-
 import evoCover.Evo;
 
 public class EvoCover {
 
 	/**
-	 * -solQtt -genQtt -logFile -resFile -evo 20 -alfa -c -limit -evo 16 -evo 10
+	 * -solQtt -genQtt -logFile -resDir -evo 20 -alfa -c -limit -evo 16 -evo 10
 	 * -evo 1015 -evo 1615
 	 */
 
@@ -34,9 +32,9 @@ public class EvoCover {
 			logFile = args[i + 1];
 		}
 
-		i = getAttIndex(args, "-resFile");
+		i = getAttIndex(args, "-resDir");
 		if (i == args.length) {
-			System.out.println("err: -resFile not set");
+			System.out.println("err: -resDir not set");
 			return;
 		} else {
 			resDir = args[i + 1];

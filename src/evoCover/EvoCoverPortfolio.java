@@ -16,6 +16,15 @@ public class EvoCoverPortfolio {
 		minW = 10;
 	}
 	
+	
+	public Double getMean(){
+		return mean;
+	}
+	
+	public Double getSemiVar(){
+		return semiVar;
+	}
+	
 	public int getId(){
 		return id;
 	}
