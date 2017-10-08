@@ -18,7 +18,8 @@ public class Evo {
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
 			graph.calcSemiVarAndSkewnessForAll();
-			graph.employedBeePhase20(alfa, c);
+			graph.employedBeePhase20(popQtt/2,alfa, c);
+			graph.onlookerBeePhase20(popQtt/2, popQtt/2);
 			//phase2???
 			//phase3???
 		}
@@ -30,7 +31,7 @@ public class Evo {
 			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver16(Math.floorDiv(popQtt, 2));
 			graph.mutation16(0.05);
-			//clearExtraSolutions
+			
 		}
 	}
 	
@@ -40,7 +41,6 @@ public class Evo {
 			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver10(Math.floorDiv(popQtt, 2));
 			graph.mutation10();
-			//clearExtraSolutions
 		}
 	}
 
@@ -50,7 +50,6 @@ public class Evo {
 			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver16(Math.floorDiv(popQtt, 2));
 			graph.mutation15();
-			//clearExtraSolutions
 		}
 	}
 	
@@ -60,7 +59,6 @@ public class Evo {
 			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver10(Math.floorDiv(popQtt, 2));
 			graph.mutation15();
-			//clearExtraSolutions
 		}
 	}	
 

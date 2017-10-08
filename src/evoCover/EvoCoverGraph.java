@@ -141,11 +141,21 @@ public class EvoCoverGraph {
 			}
 		};
 	}
+	
+	public Comparator<EvoCoverPortfolio> getFitComparator() {
+		return new Comparator<EvoCoverPortfolio>() {
+			@Override
+			public int compare(EvoCoverPortfolio o1, EvoCoverPortfolio o2) {
+				Double hv = o2.getFit();
+				return hv.compareTo(o1.getFit());
+			}
+		};
+	}
 
-	public EvoCoverPortfolio hyperVolumeLottery(List<EvoCoverPortfolio> rankedList) {
+	public EvoCoverPortfolio fitLottery(List<EvoCoverPortfolio> rankedList) {
 		double rankTotal = 0;
 		for (EvoCoverPortfolio p : rankedList) {
-			rankTotal += Math.abs(p.getHyperVolume());
+			rankTotal += p.getFit();
 		}
 		EvoCoverPortfolio p;
 		double limit = Math.abs((new Random().nextDouble()) * rankTotal);
@@ -153,7 +163,24 @@ public class EvoCoverGraph {
 		int i = 0;
 		do {
 			p = rankedList.get(i);
-			part += Math.abs(p.getHyperVolume());
+			part += p.getFit();
+			i++;
+		} while ((i < rankedList.size()) && (part < limit));
+		return p;
+	}
+	
+	public EvoCoverPortfolio hyperVolumeLottery(List<EvoCoverPortfolio> rankedList) {
+		double rankTotal = 0;
+		for (EvoCoverPortfolio p : rankedList) {
+			rankTotal += p.getHyperVolume();
+		}
+		EvoCoverPortfolio p;
+		double limit = Math.abs((new Random().nextDouble()) * rankTotal);
+		double part = 0;
+		int i = 0;
+		do {
+			p = rankedList.get(i);
+			part += p.getHyperVolume();
 			i++;
 		} while ((i < rankedList.size()) && (part < limit));
 		return p;
@@ -174,15 +201,42 @@ public class EvoCoverGraph {
 		return rankedList;
 	}
 
+	
+	//[20]
+	public void onlookerBeePhase20(int onlQtt, int empQtt) {
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList.subList(0, empQtt), getHyperVolumeComparator());
+		EvoCoverPortfolio p;
+		int total = empQtt + onlQtt;
+		for (int i = empQtt; i < total; i++) {
+			p = fitLottery(rankedList);
+			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
+				e.getRelation().coverList.set(i, e.getRelation().coverList.get(p.id));
+			}
+		}
+	}
+	
+	public void scoutBeePhase20(int empQtt, int limit){
+		for (int i = 0; i < empQtt; i++) {
+			if(solutionList.get(i).trail > limit){
+				
+			}
+		}	
+		
+		
+	}
+	
 	// [20]
-	public void employedBeePhase20(double alfa, int c) {
+	public void employedBeePhase20(int empQtt, double alfa, int c) {
 		double newCover;
-		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList, getHyperVolumeComparator());
-		EvoCoverPortfolio p2;
+		List<EvoCoverPortfolio> rankedList = getRankedList(solutionList.subList(0, empQtt), getHyperVolumeComparator());
+		EvoCoverPortfolio p1, p2;
 		int bestId = rankedList.get(0).id;
 		double z;
-		for (EvoCoverPortfolio p1 : solutionList) {
+		
+		for (int i = 0; i < empQtt; i++) {
+			p1 = solutionList.get(i);
 			p2 = hyperVolumeLottery(rankedList);
+			p1.trail++;
 			for (Edge<EvoCoverLog, EvoCoverLink> e : graph.getEdgeList()) {
 				newCover = e.getRelation().coverList.get(p1.id)
 						+ new Random().nextDouble()
@@ -191,6 +245,7 @@ public class EvoCoverGraph {
 								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
 				z = Math.round(1 / (1 + Math.exp(-1 * newCover) - alfa));
 				if (z == 1.0) {
+					p1.trail = 0;
 					e.getRelation().coverList.set(p1.id, newCover);
 				}
 			}
