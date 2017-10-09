@@ -13,11 +13,11 @@ public class Portfolio {
 		trail = 0;
 		this.id = id;
 		maxW = 0;
-		minW = 10;
+		minW = 0;
 	}
 	
 	public Double getDelta(){
-		return maxW - minW;
+		return Math.abs(maxW - minW+0.00000000000001);
 	}
 	
 	public Double getMean(){

@@ -113,8 +113,18 @@ public class CoverGraph {
 	public void calcMaxAndMinForAll() {
 		double w;
 		for (Portfolio p : solutionList) {
-			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
-				w = e.getRelation().coverList.get(p.id);
+			w = 0;
+			Vertex<StockLog, CoverLink> v0 = graph.getVertexList().get(0);
+			for (Edge<StockLog, CoverLink> e : v0.getEdgeList()) {
+				w += e.getRelation().coverList.get(p.id);
+			}
+			p.maxW = w;	
+			p.minW = w;
+			for(Vertex<StockLog, CoverLink> v : graph.getVertexList()){
+				w = 0;
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+					w += e.getRelation().coverList.get(p.id);
+				}
 				if (p.maxW < w)
 					p.maxW = w;
 				if (p.minW > w)
@@ -183,7 +193,7 @@ public class CoverGraph {
 		double weight;
 		String text = "";
 		for (Portfolio p : rank.rankedList) {
-			text += p.id+","+df.format(p.getHyperVolume())+","+df.format(p.mean)+","+df.format(p.semiVar)+","+df.format(p.skewness)+","+df.format(p.getDelta());
+			text += p.id+","+df.format(p.getHyperVolume())+","+df.format(p.getSortinoRatio())+","+df.format(p.mean)+","+df.format(p.semiVar)+","+df.format(p.skewness)+","+df.format(p.getDelta());
 			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 				weight =0;
 				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
@@ -209,6 +219,7 @@ public class CoverGraph {
 
 	public void fixGraph(int coupleQtt,Measure m) {
 		calcSemiVarAndSkewnessForAll();
+		calcMaxAndMinForAll();
 		Rank rank = new Rank(solutionList, m);
 		swapCoverListValues(rank.rankedList, buildSwapList(coupleQtt, rank.rankedList));
 		solutionList = rank.rankedList;
@@ -280,6 +291,7 @@ public class CoverGraph {
 
 	// [16]
 	public void crossOver16(int coupleQtt, Measure measure) {
+		calcMaxAndMinForAll();
 		Rank rank = new Rank(solutionList, measure);
 		Portfolio solution1, solution2;
 		int id, i = 0;
@@ -306,6 +318,7 @@ public class CoverGraph {
 
 	// [10]
 	public void mutation10() {
+		calcMaxAndMinForAll();
 		double rand, deltaQ, delta, cover, newCover;
 		double chance = 1.0 / graph.getEdgeList().size();
 		int i;

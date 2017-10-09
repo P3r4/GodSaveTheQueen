@@ -32,10 +32,8 @@ public class Evo {
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
 			graph.calcSemiVarAndSkewnessForAll();
-			graph.calcMaxAndMinForAll();
 			graph.crossOver16(Math.floorDiv(solQtt, 2), measure);
 			graph.mutation16(0.05);
-			graph.printResult(measure);
 		}
 		graph.printResult(resultDir+"evo16result.csv",  measure);
 	}
@@ -43,9 +41,7 @@ public class Evo {
 	public void evo10(int genQtt, Measure measure) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
-			System.out.println("gen: "+i);
 			graph.calcSemiVarAndSkewnessForAll();
-			graph.calcMaxAndMinForAll();
 			graph.crossOver10(Math.floorDiv(solQtt, 2));
 			graph.mutation10();
 		}
@@ -57,7 +53,6 @@ public class Evo {
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
 			graph.calcSemiVarAndSkewnessForAll();
-			graph.calcMaxAndMinForAll();
 			graph.crossOver16(Math.floorDiv(solQtt, 2), measure);
 			graph.mutation15();
 		}
@@ -69,7 +64,6 @@ public class Evo {
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
 			graph.calcSemiVarAndSkewnessForAll();
-			graph.calcMaxAndMinForAll();
 			graph.crossOver10(Math.floorDiv(solQtt, 2));
 			graph.mutation15();
 		}
