@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import evoCover.CoverGraph;
 import evoCover.CoverLink;
+import evoCover.Mean;
 import evoCover.StockLog;
 import evoCover.Portfolio;
 import graph.Edge;
@@ -46,7 +47,7 @@ public class TestEvoCoverGraph {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
-		graph.crossOver16(5);
+		graph.crossOver16(5, new Mean());
 		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;

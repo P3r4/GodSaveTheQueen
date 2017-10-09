@@ -2,19 +2,21 @@ package evoCover;
 
 import java.util.Comparator;
 
-public class Mean implements Measure {
-	
+public class SortinoRatio implements Measure{
+
 	@Override
 	public Double getValue(Portfolio p) {
-		return p.mean;
+		return p.getSortinoRatio();
 	}
 
 	public Comparator<Portfolio> getComparator() {
 		return new Comparator<Portfolio>() {
 			@Override
 			public int compare(Portfolio o1, Portfolio o2) {
-				return o2.mean.compareTo(o1.mean);
+				Double sortino = o2.getSortinoRatio();
+				return sortino.compareTo(o1.getSortinoRatio());
 			}
+			
 		};
 	}
 	

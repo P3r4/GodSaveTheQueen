@@ -1,27 +1,24 @@
 package evoCover;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
+
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-import graph.Edge;
-import graph.Vertex;
-
 public class Rank {
 
 	List<Portfolio> rankedList;
-	
+	Measure m;
 	public Rank(List<Portfolio> solutionList,
-			Comparator<Portfolio> comp) {
-		PriorityQueue<Portfolio> rankQ = new PriorityQueue<>(comp);
+			Measure measure) {
+		this.m = measure;
+		rankedList = new ArrayList<Portfolio>();
+		PriorityQueue<Portfolio> rankQ = new PriorityQueue<>(m.getComparator());
 		for (Portfolio p : solutionList) {
 			rankQ.add(p);
 		}
 		Portfolio p;
-		List<Portfolio> rankedList = new ArrayList<>();
 		while (!rankQ.isEmpty()) {
 			p = rankQ.poll();
 			rankedList.add(p);
@@ -33,7 +30,7 @@ public class Rank {
 	}
 	
 
-	public Portfolio lottery(Measure m) {
+	public Portfolio lottery() {
 		double rankTotal = 0;
 		for (Portfolio p : rankedList) {
 			rankTotal += m.getValue(p);

@@ -35,7 +35,7 @@ public class CoverGraph {
 	public List<Portfolio> getSolutionList() {
 		return solutionList;
 	}
-
+	
 	public void markGraph(double corrTLimit, double meanBLimit, double semiVarTLimit) {
 
 		for (Vertex<StockLog, CoverLink> vertex : graph.getVertexList()) {
@@ -110,7 +110,7 @@ public class CoverGraph {
 		}
 	}
 
-	public void maxAndMin() {
+	public void calcMaxAndMinForAll() {
 		double w;
 		for (Portfolio p : solutionList) {
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
@@ -123,52 +123,13 @@ public class CoverGraph {
 		}
 	}
 
-	public Comparator<Portfolio> getMeanComparator() {
-		return new Comparator<Portfolio>() {
-			@Override
-			public int compare(Portfolio o1, Portfolio o2) {
-				return o2.mean.compareTo(o1.mean);
-			}
-		};
-	}
-
-	public Comparator<Portfolio> getSemiVarComparator() {
-		return new Comparator<Portfolio>() {
-			@Override
-			public int compare(Portfolio o1, Portfolio o2) {
-				return o1.semiVar.compareTo(o2.semiVar);
-			}
-		};
-	}	
-	
-	public Comparator<Portfolio> getHyperVolumeComparator() {
-		return new Comparator<Portfolio>() {
-			@Override
-			public int compare(Portfolio o1, Portfolio o2) {
-				Double hv = o2.getHyperVolume();
-				return hv.compareTo(o1.getHyperVolume());
-			}
-		};
-	}
-
-	public Comparator<Portfolio> getFitComparator() {
-		return new Comparator<Portfolio>() {
-			@Override
-			public int compare(Portfolio o1, Portfolio o2) {
-				Double hv = o2.getFit();
-				return hv.compareTo(o1.getFit());
-			}
-		};
-	}
-
-
 	// [20]
 	public void onlookerBeePhase20(int onlQtt, int empQtt) {
-		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, new HV());
 		Portfolio p;
 		int total = empQtt + onlQtt;
 		for (int i = empQtt; i < total; i++) {
-			p = rank.lottery(new HV());
+			p = rank.lottery();
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 				e.getRelation().coverList.set(i, e.getRelation().coverList.get(p.id));
 			}
@@ -190,14 +151,14 @@ public class CoverGraph {
 	// [20]
 	public void employedBeePhase20(int empQtt, double alfa, int c) {
 		double newCover;
-		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, new HV());
 		Portfolio p1, p2;
 		int bestId = rank.getFirst().id;
 		double z;
 
 		for (int i = 0; i < empQtt; i++) {
 			p1 = solutionList.get(i);
-			p2 = rank.lottery(new HV());
+			p2 = rank.lottery();
 			p1.trail++;
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 				newCover = e.getRelation().coverList.get(p1.id)
@@ -215,14 +176,14 @@ public class CoverGraph {
 		}
 	}
 
-	public String formatResult(){
+	public String formatResult(Measure measure){
 		
-		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, measure);
 		DecimalFormat df = new DecimalFormat("#0.000000");
 		double weight;
 		String text = "";
 		for (Portfolio p : rank.rankedList) {
-			text += p.id+","+df.format(p.getHyperVolume())+","+df.format(p.mean)+","+df.format(p.semiVar)+","+df.format(p.skewness);
+			text += p.id+","+df.format(p.getHyperVolume())+","+df.format(p.mean)+","+df.format(p.semiVar)+","+df.format(p.skewness)+","+df.format(p.getDelta());
 			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 				weight =0;
 				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
@@ -235,20 +196,20 @@ public class CoverGraph {
 		return text;
 	}
 
-	public void printResult() {
-		System.out.print(formatResult());
+	public void printResult(Measure measure) {
+		System.out.print(formatResult(measure));
 		System.out.println("------------");
 	}
 	
-	public void printResult(String resultFile) throws FileNotFoundException {
+	public void printResult(String resultFile,Measure measure) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(resultFile);
-		writer.print(formatResult());
+		writer.print(formatResult(measure));
 		writer.close();
 	}
 
-	public void fixGraph(int coupleQtt) {
+	public void fixGraph(int coupleQtt,Measure m) {
 		calcSemiVarAndSkewnessForAll();
-		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+		Rank rank = new Rank(solutionList, m);
 		swapCoverListValues(rank.rankedList, buildSwapList(coupleQtt, rank.rankedList));
 		solutionList = rank.rankedList;
 		fixCoverListForAllEdges(coupleQtt);
@@ -289,14 +250,14 @@ public class CoverGraph {
 
 	// [10]
 	public void crossOver10(int coupleQtt) {
-		Rank rank = new Rank(solutionList, getMeanComparator());
+		Rank rank = new Rank(solutionList, new Mean());
 		Portfolio solution1, solution2;
 		int id, i = 0;
 		double cover1, cover2, rand, beta;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = rank.lottery(new Mean());
-			solution2 = rank.lottery(new Mean());
+			solution1 = rank.lottery();
+			solution2 = rank.lottery();
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
@@ -314,19 +275,19 @@ public class CoverGraph {
 			normalize(id);
 			normalize(id + 1);
 		}
-		fixGraph(coupleQtt);
+		fixGraph(coupleQtt, new Mean());
 	}
 
 	// [16]
-	public void crossOver16(int coupleQtt) {
-		Rank rank = new Rank(solutionList, getHyperVolumeComparator());
+	public void crossOver16(int coupleQtt, Measure measure) {
+		Rank rank = new Rank(solutionList, measure);
 		Portfolio solution1, solution2;
 		int id, i = 0;
 		double c1, c2, rand;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = rank.lottery(new HV());
-			solution2 = rank.lottery(new HV());
+			solution1 = rank.lottery();
+			solution2 = rank.lottery();
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
@@ -340,12 +301,11 @@ public class CoverGraph {
 			normalize(id);
 			normalize(id + 1);
 		}
-		fixGraph(coupleQtt);
+		fixGraph(coupleQtt, measure);
 	}
 
 	// [10]
 	public void mutation10() {
-		maxAndMin();
 		double rand, deltaQ, delta, cover, newCover;
 		double chance = 1.0 / graph.getEdgeList().size();
 		int i;
@@ -401,7 +361,6 @@ public class CoverGraph {
 					newCover = e.getRelation().coverList.get(p.id) * (new Random().nextDouble()) * 2;
 					e.getRelation().coverList.set(p.id, newCover);
 				}
-
 			}
 			normalize(p.id);
 		}

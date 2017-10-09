@@ -16,6 +16,9 @@ public class Portfolio {
 		minW = 10;
 	}
 	
+	public Double getDelta(){
+		return maxW - minW;
+	}
 	
 	public Double getMean(){
 		return mean;
@@ -43,11 +46,11 @@ public class Portfolio {
 		return out; 
 	}
 	
-	public double getHyperVolume(){
-		return (mean+1)*(skewness+1)*(1/semiVar);
+	public Double getHyperVolume(){
+		return (mean+1)*(skewness+1)*(1/semiVar)*(1/getDelta());
 	}
 	
-	public double getSortinoRatio(){
+	public Double getSortinoRatio(){
 		return mean/semiVar;
 	}
 	

@@ -1,6 +1,13 @@
 import java.io.IOException;
 
+import evoCover.Delta;
 import evoCover.Evo;
+import evoCover.HV;
+import evoCover.Mean;
+import evoCover.Measure;
+import evoCover.SemiVariance;
+import evoCover.Skewness;
+import evoCover.SortinoRatio;
 
 public class EvoCover {
 
@@ -20,10 +27,18 @@ public class EvoCover {
 
 	public static void main(String[] args) {
 		int solQtt = -1, genQtt = -1, evo = -1, c = -1, limit = -1;
-		String logFile = null, resDir = null;
+		String logFile = null, resDir = null, measure = null;
 		double alfa = -1.0;
 
 		int i;
+		i = getAttIndex(args, "-me");
+		if (i == args.length) {
+			System.out.println("err: -me not set");
+			return;
+		} else {
+			measure = args[i + 1];
+		}
+		
 		i = getAttIndex(args, "-logFile");
 		if (i == args.length) {
 			System.out.println("err: -logFile not set");
@@ -92,18 +107,37 @@ public class EvoCover {
 
 		}
 
+		Measure m;
+		if(measure.equals("semiVar")){
+			m = new SemiVariance();
+		} else if(measure.equals("mean")){
+			m = new Mean();
+		} else if(measure.equals("delta")){
+			m = new Delta();
+		} else if(measure.equals("sortino")){
+			m = new SortinoRatio();
+		} else if(measure.equals("hv")){
+			m = new HV();
+		} else if(measure.equals("skewness")){
+			m = new Skewness();
+		}else{
+			System.out.println("err: invalid -me" );
+			return;
+		}
+		
+		
 		try {
 			Evo e = new Evo(solQtt, logFile, resDir);			
 			if (evo == 20) {
-				e.evo20(genQtt, alfa, c, limit);
+				e.evo20(genQtt, alfa, c, limit,m);
 			} else if (evo == 10) {
-				e.evo10(genQtt);
+				e.evo10(genQtt,m);
 			} else if (evo == 16) {
-				e.evo16(genQtt);
+				e.evo16(genQtt, m);
 			} else if (evo == 1015) {
-				e.evo1015(genQtt);
+				e.evo1015(genQtt,m);
 			} else if (evo == 1615) {
-				e.evo1615(genQtt);
+				e.evo1615(genQtt, m);
 			}
 		} catch (IOException e) {
 			System.out.println("err: " + e.getMessage());
