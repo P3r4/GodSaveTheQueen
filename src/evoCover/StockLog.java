@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EvoCoverLog {
+public class StockLog {
 
 	String tradeCode;
 	List<Double> priceLog;
@@ -22,7 +22,7 @@ public class EvoCoverLog {
 		}
 	}
 
-	public EvoCoverLog(String line) {
+	public StockLog(String line) {
 		mean = 0;
 		variance = 0.000000000000001;		
 		this.priceLog = new ArrayList<>();
@@ -82,7 +82,7 @@ public class EvoCoverLog {
 
 	}
 
-	public double calcCorrelation(EvoCoverLog other) {
+	public double calcCorrelation(StockLog other) {
 		double term1 = 0;
 		for (int i = 0; i < returnLog.size(); i++) {
 			term1 += (this.returnLog.get(i) - this.mean) * (other.returnLog.get(i) - other.mean);

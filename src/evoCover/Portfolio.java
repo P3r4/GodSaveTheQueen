@@ -1,6 +1,6 @@
 package evoCover;
 
-public class EvoCoverPortfolio {
+public class Portfolio {
 	int id;
 	Double mean;
 	Double semiVar;
@@ -9,7 +9,7 @@ public class EvoCoverPortfolio {
 	double minW;
 	int trail;
 	
-	public EvoCoverPortfolio(int id){
+	public Portfolio(int id){
 		trail = 0;
 		this.id = id;
 		maxW = 0;

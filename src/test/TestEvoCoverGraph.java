@@ -6,10 +6,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import evoCover.EvoCoverGraph;
-import evoCover.EvoCoverLink;
-import evoCover.EvoCoverLog;
-import evoCover.EvoCoverPortfolio;
+import evoCover.CoverGraph;
+import evoCover.CoverLink;
+import evoCover.StockLog;
+import evoCover.Portfolio;
 import graph.Edge;
 import graph.Vertex;
 
@@ -19,17 +19,17 @@ public class TestEvoCoverGraph {
 	
 	@Test
 	public void testCrossOver10() throws IOException {
-		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
 		graph.crossOver10(5);
 		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 				}
 			}
@@ -43,17 +43,17 @@ public class TestEvoCoverGraph {
 
 	@Test
 	public void testCrossOver16() throws IOException {
-		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
 		graph.crossOver16(5);
 		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 				}
 			}
@@ -69,16 +69,16 @@ public class TestEvoCoverGraph {
 	
 	@Test
 	public void testEmpBee20() throws IOException{
-		EvoCoverGraph graph = new EvoCoverGraph(40, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(40, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
 		
 		String p1 = "",p2 = "";
     	double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -91,10 +91,10 @@ public class TestEvoCoverGraph {
 		graph.employedBeePhase20(20, 0.06 , 2);
 			
 		greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -109,16 +109,16 @@ public class TestEvoCoverGraph {
 
 	@Test
 	public void testOnlBee20() throws IOException{
-		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
 		
 		String p1 = "",p2 = "";
     	double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -131,10 +131,10 @@ public class TestEvoCoverGraph {
 		graph.onlookerBeePhase20(5, 5);
 			
 		greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -148,16 +148,16 @@ public class TestEvoCoverGraph {
 	
 	@Test
 	public void testMutation10() throws IOException {
-		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcMeanReturnForAll();
 		
 		String p1 = "",p2 = "";
     	double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -169,10 +169,10 @@ public class TestEvoCoverGraph {
 		graph.mutation10();
 		
 		greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -186,17 +186,17 @@ public class TestEvoCoverGraph {
 	
 	@Test
 	public void testMutation16() throws IOException {
-		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcMeanReturnForAll();
 		
 		String p1 = "",p2 = "";
 
 		double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -208,10 +208,10 @@ public class TestEvoCoverGraph {
 		graph.mutation16(0.2);
 		
 		greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -225,16 +225,16 @@ public class TestEvoCoverGraph {
 	
 	@Test
 	public void testMutation15() throws IOException {
-		EvoCoverGraph graph = new EvoCoverGraph(10, "./samples/filteredCSV/part1.csv");
+		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
 		
 		String p1 = "",p2 = "";
     	double total, greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -246,10 +246,10 @@ public class TestEvoCoverGraph {
 		graph.mutation15();
 		
 		greatT = 0;
-		for (EvoCoverPortfolio p : graph.getSolutionList()) {
+		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<EvoCoverLog, EvoCoverLink> v : graph.getVertexList()) {
-				for (Edge<EvoCoverLog, EvoCoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}

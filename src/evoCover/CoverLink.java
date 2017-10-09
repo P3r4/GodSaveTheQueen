@@ -3,13 +3,13 @@ package evoCover;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EvoCoverLink {
+public class CoverLink {
 
 	double correlation;
 	List<Double> coverList;
 	int flag;
 	
-	public EvoCoverLink(){
+	public CoverLink(){
 		coverList = new ArrayList<>();
 	}
 	

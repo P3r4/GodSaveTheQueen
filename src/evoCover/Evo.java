@@ -6,14 +6,14 @@ import java.io.IOException;
 
 public class Evo {
 
-	EvoCoverGraph graph;
+	CoverGraph graph;
 	int solQtt;
 	String resultDir;
 	
 	public Evo(int solQtt, String fileName, String resultDir) throws IOException{
 		this.solQtt = solQtt;
 		this.resultDir = resultDir;
-		graph =  new EvoCoverGraph(solQtt,fileName);
+		graph =  new CoverGraph(solQtt,fileName);
 	}
 	
 	public void evo20(int genQtt, double alfa, int c, int limit) throws FileNotFoundException{
