@@ -183,10 +183,10 @@ public class CoverGraph {
 								* (e.getRelation().coverList.get(p1.id) - e.getRelation().coverList.get(p2.id))
 						+ new Random().nextInt(c + 1)
 								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
+				
 				z = Math.round(1 / (1 + Math.exp(-1 * newCover) - alfa));
 				if ((z == 1.0) && (newCover > 0)) {
 					p1.trail = 0;
-					System.out.print(newCover);
 					e.getRelation().coverList.set(p1.id, newCover);
 				}
 			}
