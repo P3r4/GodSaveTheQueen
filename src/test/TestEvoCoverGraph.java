@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import evoCover.CoverGraph;
 import evoCover.CoverLink;
+import evoCover.Fit;
 import evoCover.Mean;
 import evoCover.StockLog;
 import evoCover.Portfolio;
@@ -23,7 +24,7 @@ public class TestEvoCoverGraph {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
-		graph.crossOver10(5);
+		graph.crossOver10(5,new Mean());
 		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
@@ -89,7 +90,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(40.0,greatT,0.00000000001);
 		
-		graph.employedBeePhase20(20, 0.06 , 2);
+		graph.employedBeePhase20(20, 0.06 , 2, new Mean());
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
@@ -129,7 +130,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		
-		graph.onlookerBeePhase20(5, 5);
+		graph.onlookerBeePhase20(5, 5, new Fit());
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {

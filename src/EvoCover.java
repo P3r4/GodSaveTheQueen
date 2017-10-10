@@ -2,6 +2,7 @@ import java.io.IOException;
 
 import evoCover.Delta;
 import evoCover.Evo;
+import evoCover.Fit;
 import evoCover.HV;
 import evoCover.Mean;
 import evoCover.Measure;
@@ -13,7 +14,7 @@ public class EvoCover {
 
 	/**
 	 * -solQtt -genQtt -logFile -resDir -evo 20 -alfa -c -limit -evo 16 -evo 10
-	 * -evo 1015 -evo 1615
+	 * -evo 1015 -evo 1615 -me
 	 */
 
 	private static int getAttIndex(String[] args, String att) {
@@ -108,10 +109,12 @@ public class EvoCover {
 		}
 
 		Measure m;
-		if(measure.equals("semiVar")){
+		if(measure.equals("semivar")){
 			m = new SemiVariance();
 		} else if(measure.equals("mean")){
 			m = new Mean();
+		} else if(measure.equals("fit")){
+			m = new Fit();
 		} else if(measure.equals("delta")){
 			m = new Delta();
 		} else if(measure.equals("sortino")){

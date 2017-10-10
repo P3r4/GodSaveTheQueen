@@ -35,7 +35,7 @@ public class CoverGraph {
 	public List<Portfolio> getSolutionList() {
 		return solutionList;
 	}
-	
+
 	public void markGraph(double corrTLimit, double meanBLimit, double semiVarTLimit) {
 
 		for (Vertex<StockLog, CoverLink> vertex : graph.getVertexList()) {
@@ -118,9 +118,9 @@ public class CoverGraph {
 			for (Edge<StockLog, CoverLink> e : v0.getEdgeList()) {
 				w += e.getRelation().coverList.get(p.id);
 			}
-			p.maxW = w;	
+			p.maxW = w;
 			p.minW = w;
-			for(Vertex<StockLog, CoverLink> v : graph.getVertexList()){
+			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 				w = 0;
 				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					w += e.getRelation().coverList.get(p.id);
@@ -134,14 +134,18 @@ public class CoverGraph {
 	}
 
 	// [20]
-	public void onlookerBeePhase20(int onlQtt, int empQtt) {
-		Rank rank = new Rank(solutionList, new HV());
-		Portfolio p;
+	public void onlookerBeePhase20(int onlQtt, int empQtt, Measure measure) {
+
+		Rank rank = new Rank(solutionList.subList(0, empQtt), measure);
+		Portfolio p1, p2;
 		int total = empQtt + onlQtt;
 		for (int i = empQtt; i < total; i++) {
-			p = rank.lottery();
-			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
-				e.getRelation().coverList.set(i, e.getRelation().coverList.get(p.id));
+			p1 = solutionList.get(i);
+			p2 = rank.lottery();
+			if (measure.getComparator().compare(p1, p2) > 0) {
+				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+					e.getRelation().coverList.set(i, e.getRelation().coverList.get(p2.id));
+				}
 			}
 		}
 	}
@@ -149,6 +153,7 @@ public class CoverGraph {
 	public void scoutBeePhase20(int empQtt, int limit) {
 		for (int i = 0; i < empQtt; i++) {
 			if (solutionList.get(i).trail > limit) {
+				solutionList.get(i).trail = 0;
 				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 					e.getRelation().coverList.add(new Random().nextDouble());
 				}
@@ -159,9 +164,11 @@ public class CoverGraph {
 	}
 
 	// [20]
-	public void employedBeePhase20(int empQtt, double alfa, int c) {
+	public void employedBeePhase20(int empQtt, double alfa, int c, Measure measure) {
+		calcSemiVarAndSkewnessForAll();
+		calcMaxAndMinForAll();
 		double newCover;
-		Rank rank = new Rank(solutionList, new HV());
+		Rank rank = new Rank(solutionList.subList(0, empQtt), measure);
 		Portfolio p1, p2;
 		int bestId = rank.getFirst().id;
 		double z;
@@ -177,8 +184,9 @@ public class CoverGraph {
 						+ new Random().nextInt(c + 1)
 								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
 				z = Math.round(1 / (1 + Math.exp(-1 * newCover) - alfa));
-				if (z == 1.0) {
+				if ((z == 1.0) && (newCover > 0)) {
 					p1.trail = 0;
+					System.out.print(newCover);
 					e.getRelation().coverList.set(p1.id, newCover);
 				}
 			}
@@ -186,20 +194,22 @@ public class CoverGraph {
 		}
 	}
 
-	public String formatResult(Measure measure){
-		
+	public String formatResult(Measure measure) {
+
 		Rank rank = new Rank(solutionList, measure);
 		DecimalFormat df = new DecimalFormat("#0.000000");
 		double weight;
 		String text = "";
 		for (Portfolio p : rank.rankedList) {
-			text += p.id+","+df.format(p.getHyperVolume())+","+df.format(p.getSortinoRatio())+","+df.format(p.mean)+","+df.format(p.semiVar)+","+df.format(p.skewness)+","+df.format(p.getDelta());
+			text += p.id + "," + df.format(p.getHyperVolume()) + "," + df.format(p.getSortinoRatio()) + ","
+					+ df.format(p.mean) + "," + df.format(p.semiVar) + "," + df.format(p.skewness) + ","
+					+ df.format(p.getDelta());
 			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				weight =0;
+				weight = 0;
 				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
 				}
-				text += ","+v.getContent().tradeCode+","+df.format(weight);
+				text += "," + v.getContent().tradeCode + "," + df.format(weight);
 			}
 			text += "\n";
 		}
@@ -210,14 +220,14 @@ public class CoverGraph {
 		System.out.print(formatResult(measure));
 		System.out.println("------------");
 	}
-	
-	public void printResult(String resultFile,Measure measure) throws FileNotFoundException {
+
+	public void printResult(String resultFile, Measure measure) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(resultFile);
 		writer.print(formatResult(measure));
 		writer.close();
 	}
 
-	public void fixGraph(int coupleQtt,Measure m) {
+	public void fixGraph(int coupleQtt, Measure m) {
 		calcSemiVarAndSkewnessForAll();
 		calcMaxAndMinForAll();
 		Rank rank = new Rank(solutionList, m);
@@ -260,8 +270,10 @@ public class CoverGraph {
 	}
 
 	// [10]
-	public void crossOver10(int coupleQtt) {
-		Rank rank = new Rank(solutionList, new Mean());
+	public void crossOver10(int coupleQtt, Measure measure) {
+		calcSemiVarAndSkewnessForAll();
+		calcMaxAndMinForAll();
+		Rank rank = new Rank(solutionList, measure);
 		Portfolio solution1, solution2;
 		int id, i = 0;
 		double cover1, cover2, rand, beta;
@@ -286,11 +298,12 @@ public class CoverGraph {
 			normalize(id);
 			normalize(id + 1);
 		}
-		fixGraph(coupleQtt, new Mean());
+		fixGraph(coupleQtt, measure);
 	}
 
 	// [16]
 	public void crossOver16(int coupleQtt, Measure measure) {
+		calcSemiVarAndSkewnessForAll();
 		calcMaxAndMinForAll();
 		Rank rank = new Rank(solutionList, measure);
 		Portfolio solution1, solution2;
@@ -516,8 +529,7 @@ public class CoverGraph {
 		markGraph(corrTLimit, meanBLimit, semiVarTLimit);
 		int initialQtt = 19;
 		countLevelForAll();
-		PriorityQueue<Vertex<StockLog, CoverLink>> sortedByLevelQ = new PriorityQueue<>(
-				this.getLevelDescComparator());
+		PriorityQueue<Vertex<StockLog, CoverLink>> sortedByLevelQ = new PriorityQueue<>(this.getLevelDescComparator());
 
 		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 			sortedByLevelQ.add(v);

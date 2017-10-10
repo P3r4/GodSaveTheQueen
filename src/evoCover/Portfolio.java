@@ -33,7 +33,7 @@ public class Portfolio {
 	}
 	
 	public double getFit(){
-		return calcFit(mean)*calcFit(skewness)*calcFit(semiVar);
+		return calcFit(mean)*calcFit(skewness)*calcFit(1/semiVar)*calcFit(1/getDelta());
 	}
 	
 	public double calcFit(double value){

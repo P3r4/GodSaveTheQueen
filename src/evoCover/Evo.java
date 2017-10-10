@@ -19,11 +19,9 @@ public class Evo {
 	public void evo20(int genQtt, double alfa, int c, int limit, Measure measure) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
-			graph.calcSemiVarAndSkewnessForAll();
-			graph.calcMaxAndMinForAll();
-			graph.employedBeePhase20(solQtt/2,alfa, c);
-			graph.onlookerBeePhase20(solQtt/2, solQtt/2);
-			graph.scoutBeePhase20(solQtt/2, limit);
+			graph.employedBeePhase20(Math.floorDiv(solQtt, 2),alfa, c,measure);
+			graph.onlookerBeePhase20(Math.floorDiv(solQtt, 2), Math.floorDiv(solQtt, 2),new Fit());
+			graph.scoutBeePhase20(Math.floorDiv(solQtt, 2), limit);
 		}
 		graph.printResult(resultDir+"evo20result.csv", measure);
 	}
@@ -31,7 +29,6 @@ public class Evo {
 	public void evo16(int genQtt, Measure measure) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
-			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver16(Math.floorDiv(solQtt, 2), measure);
 			graph.mutation16(0.05);
 		}
@@ -41,8 +38,7 @@ public class Evo {
 	public void evo10(int genQtt, Measure measure) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
-			graph.calcSemiVarAndSkewnessForAll();
-			graph.crossOver10(Math.floorDiv(solQtt, 2));
+			graph.crossOver10(Math.floorDiv(solQtt, 2),measure);
 			graph.mutation10();
 		}
 
@@ -52,7 +48,6 @@ public class Evo {
 	public void evo1615(int genQtt, Measure measure) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
-			graph.calcSemiVarAndSkewnessForAll();
 			graph.crossOver16(Math.floorDiv(solQtt, 2), measure);
 			graph.mutation15();
 		}
@@ -63,8 +58,7 @@ public class Evo {
 	public void evo1015(int genQtt, Measure measure) throws FileNotFoundException{
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
-			graph.calcSemiVarAndSkewnessForAll();
-			graph.crossOver10(Math.floorDiv(solQtt, 2));
+			graph.crossOver10(Math.floorDiv(solQtt, 2),measure);
 			graph.mutation15();
 		}
 		graph.printResult(resultDir+"evo1015result.csv",  measure);
