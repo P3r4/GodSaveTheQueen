@@ -21,6 +21,7 @@ public class CoverGraph {
 	List<Integer> dayList;
 	String fileName;
 	int solutionQtt;
+	String plotData;
 
 	public CoverGraph(int sqtt, String fileName) throws IOException {
 		solutionQtt = sqtt;
@@ -198,28 +199,39 @@ public class CoverGraph {
 		}
 	}
 
+	public String formatHeader(Measure measure){
+		String header = "id,"+measure.getClass().getSimpleName()+",Mean,SemiVar";
+		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) header += ","+v.getContent().tradeCode;
+		return header+"\n";
+	}
+	
 	public String formatResult(Measure measure) {
-
 		Rank rank = new Rank(solutionList, measure);
 		DecimalFormat df = new DecimalFormat("#0.000000");
 		double weight;
 		String text = "";
 		for (Portfolio p : rank.rankedList) {
-			text += p.id + "," + df.format(p.getHyperVolume()) + "," + df.format(p.getSortinoRatio()) + ","
-					+ df.format(p.mean) + "," + df.format(p.semiVar) + "," + df.format(p.skewness) + ","
-					+ df.format(p.getDelta());
+			text += p.id + "," + df.format(measure.getValue(p)) + ","+ df.format(p.mean) + "," + df.format(p.semiVar) ;
 			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
 				}
-				text += "," + v.getContent().tradeCode + "," + df.format(weight);
+				text += "," + df.format(weight);
 			}
 			text += "\n";
 		}
 		return text;
 	}
 
+	public String getMeanAndSemiVar(){
+		String out = "";
+		for(Portfolio p : solutionList){
+			out += p.mean+","+p.semiVar+"\n";
+		}
+		return out;
+	}
+	
 	public void printResult(Measure measure) {
 		System.out.print(formatResult(measure));
 		System.out.println("------------");
