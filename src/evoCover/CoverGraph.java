@@ -135,7 +135,7 @@ public class CoverGraph {
 
 	// [20]
 	public void onlookerBeePhase20(int onlQtt, int empQtt, Measure measure) {
-
+		System.out.println("------");
 		Rank rank = new Rank(solutionList.subList(0, empQtt), measure);
 		Portfolio p1, p2;
 		int total = empQtt + onlQtt;
@@ -143,6 +143,7 @@ public class CoverGraph {
 			p1 = solutionList.get(i);
 			p2 = rank.lottery();
 			if (measure.getComparator().compare(p1, p2) > 0) {
+				System.out.println("onlooker");
 				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 					e.getRelation().coverList.set(i, e.getRelation().coverList.get(p2.id));
 				}
@@ -151,8 +152,10 @@ public class CoverGraph {
 	}
 
 	public void scoutBeePhase20(int empQtt, int limit) {
+		System.out.println("------");
 		for (int i = 0; i < empQtt; i++) {
 			if (solutionList.get(i).trail > limit) {
+				System.out.println("scout");
 				solutionList.get(i).trail = 0;
 				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 					e.getRelation().coverList.add(new Random().nextDouble());
@@ -184,8 +187,9 @@ public class CoverGraph {
 						+ new Random().nextInt(c + 1)
 								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
 				
-				z = Math.round(1 / (1 + Math.exp(-1 * newCover) - alfa));
+				z = Math.round(1 / (1 + Math.exp(-1 * newCover)) - alfa);
 				if ((z == 1.0) && (newCover > 0)) {
+					
 					p1.trail = 0;
 					e.getRelation().coverList.set(p1.id, newCover);
 				}
@@ -339,6 +343,7 @@ public class CoverGraph {
 			i = 0;
 			for (Edge<StockLog, CoverLink> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
+					System.out.println("mutation10");
 					rand = new Random().nextDouble();
 					cover = e1.getRelation().coverList.get(p.id);
 					if (rand <= 0.5) {
@@ -367,6 +372,7 @@ public class CoverGraph {
 		for (Portfolio p : solutionList) {
 			for (Edge<StockLog, CoverLink> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
+					System.out.println("mutation15");
 					tradeE1 = e1.getRelation().coverList.get(p.id);
 					e2Id = new Random().nextInt(graph.getEdgeList().size());
 					tradeE2 = graph.getEdgeList().get(e2Id).getRelation().coverList.get(p.id);
@@ -383,6 +389,7 @@ public class CoverGraph {
 		double newCover;
 		for (Portfolio p : solutionList) {
 			if (new Random().nextDouble() < chance) {
+				System.out.println("mutation16");
 				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 					newCover = e.getRelation().coverList.get(p.id) * (new Random().nextDouble()) * 2;
 					e.getRelation().coverList.set(p.id, newCover);

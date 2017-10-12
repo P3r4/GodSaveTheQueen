@@ -20,7 +20,7 @@ public class Evo {
 		graph.randomInit();
 		for (int i = 0; i < genQtt; i++) {
 			graph.employedBeePhase20(Math.floorDiv(solQtt, 2),alfa, c,measure);
-			graph.onlookerBeePhase20(Math.floorDiv(solQtt, 2), Math.floorDiv(solQtt, 2),new Fit());
+			graph.onlookerBeePhase20(Math.floorDiv(solQtt, 2), Math.floorDiv(solQtt, 2),new SemiVariance());
 			graph.scoutBeePhase20(Math.floorDiv(solQtt, 2), limit);
 		}
 		graph.printResult(resultDir+"evo20result.csv", measure);

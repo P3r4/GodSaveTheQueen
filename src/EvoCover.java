@@ -2,7 +2,6 @@ import java.io.IOException;
 
 import evoCover.Delta;
 import evoCover.Evo;
-import evoCover.Fit;
 import evoCover.HV;
 import evoCover.Mean;
 import evoCover.Measure;
@@ -113,8 +112,6 @@ public class EvoCover {
 			m = new SemiVariance();
 		} else if(measure.equals("mean")){
 			m = new Mean();
-		} else if(measure.equals("fit")){
-			m = new Fit();
 		} else if(measure.equals("delta")){
 			m = new Delta();
 		} else if(measure.equals("sortino")){
@@ -141,6 +138,9 @@ public class EvoCover {
 				e.evo1015(genQtt,m);
 			} else if (evo == 1615) {
 				e.evo1615(genQtt, m);
+			} else{
+				System.out.println("err:  invalid -evo");
+				return;
 			}
 		} catch (IOException e) {
 			System.out.println("err: " + e.getMessage());

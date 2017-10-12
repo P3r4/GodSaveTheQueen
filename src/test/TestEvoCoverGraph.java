@@ -8,10 +8,10 @@ import org.junit.Test;
 
 import evoCover.CoverGraph;
 import evoCover.CoverLink;
-import evoCover.Fit;
 import evoCover.Mean;
 import evoCover.StockLog;
 import evoCover.Portfolio;
+import evoCover.SemiVariance;
 import graph.Edge;
 import graph.Vertex;
 
@@ -130,7 +130,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		
-		graph.onlookerBeePhase20(5, 5, new Fit());
+		graph.onlookerBeePhase20(5, 5, new SemiVariance());
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
