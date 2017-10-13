@@ -189,7 +189,7 @@ public class CoverGraph {
 	}
 
 	// [20]
-	public void employedBeePhase20(double alfa, int c, Measure measure) {
+	public void employedBeePhase20(int c, Measure measure) {
 		calcSemiVarAndSkewnessForAll();
 		calcMaxAndMinForAll();
 		double newCover;

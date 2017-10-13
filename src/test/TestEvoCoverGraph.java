@@ -91,7 +91,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(40.0,greatT,0.00000000001);
 		
-		graph.employedBeePhase20(0.06 , 2, new Mean());
+		graph.employedBeePhase20( 2, new Mean());
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {

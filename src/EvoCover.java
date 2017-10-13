@@ -80,15 +80,6 @@ public class EvoCover {
 		}
 
 		if (evo == 20) {
-
-			i = getAttIndex(args, "-alfa");
-			if (i == args.length) {
-				System.out.println("err: -alfa not set");
-				return;
-			} else {
-				alfa = Double.parseDouble(args[i + 1]);
-			}
-
 			i = getAttIndex(args, "-c");
 			if (i == args.length) {
 				System.out.println("err: -c not set");
@@ -129,7 +120,7 @@ public class EvoCover {
 		try {
 			Evo e = new Evo(solQtt, logFile, resDir);			
 			if (evo == 20) {
-				e.evo20(genQtt, alfa, c, limit,m);
+				e.evo20(genQtt, c, limit,m);
 			} else if (evo == 10) {
 				e.evo10(genQtt,m);
 			} else if (evo == 16) {

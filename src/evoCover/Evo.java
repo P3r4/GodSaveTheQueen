@@ -16,12 +16,12 @@ public class Evo {
 		graph = new CoverGraph(solQtt, fileName);
 	}
 
-	public void evo20(int genQtt, double alfa, int c, int limit, Measure measure) throws FileNotFoundException {
+	public void evo20(int genQtt, int c, int limit, Measure measure) throws FileNotFoundException {
 		graph.randomInit();
 		PrintWriter writer = new PrintWriter(resultDir +solQtt+"_"+genQtt+"_evo20_"+ measure.getClass().getSimpleName() + "_result.csv");
 		writer.println(graph.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
-			graph.employedBeePhase20(alfa, c, measure);
+			graph.employedBeePhase20(c, measure);
 			graph.onlookerBeePhase20(measure);
 			graph.scoutBeePhase20(Math.floorDiv(solQtt, 2), limit);
 			writer.print(graph.formatResult(measure));
