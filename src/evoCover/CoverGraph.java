@@ -112,43 +112,62 @@ public class CoverGraph {
 	}
 
 	public void calcMaxAndMinForAll() {
-		double w;
 		for (Portfolio p : solutionList) {
-			w = 0;
-			Vertex<StockLog, CoverLink> v0 = graph.getVertexList().get(0);
-			for (Edge<StockLog, CoverLink> e : v0.getEdgeList()) {
-				w += e.getRelation().coverList.get(p.id);
-			}
-			p.maxW = w;
-			p.minW = w;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				w = 0;
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
-					w += e.getRelation().coverList.get(p.id);
-				}
-				if (p.maxW < w)
-					p.maxW = w;
-				if (p.minW > w)
-					p.minW = w;
-			}
+			calcMaxAndMin(p);
 		}
 	}
 
+	public void calcMaxAndMin(Portfolio p) {
+		double w;
+		w = 0;
+		Vertex<StockLog, CoverLink> v0 = graph.getVertexList().get(0);
+		for (Edge<StockLog, CoverLink> e : v0.getEdgeList()) {
+			w += e.getRelation().coverList.get(p.id);
+		}
+		p.maxW = w;
+		p.minW = w;
+		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+			w = 0;
+			for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+				w += e.getRelation().coverList.get(p.id);
+			}
+			if (p.maxW < w)
+				p.maxW = w;
+			if (p.minW > w)
+				p.minW = w;
+		}
+
+	}
+
+	public Portfolio lottery(Measure m) {
+		double total = 0;
+		Portfolio p;
+        for (int i = 0; i < solutionQtt; i++) {
+        	p = solutionList.get(i); 
+    		total += m.getValue(p);
+		}
+		double limit = Math.abs((new Random().nextDouble()) * total);
+		double part = 0;
+		int i = 0;
+		do {
+			p = solutionList.get(i);
+			part += m.getValue(p);
+			i++;
+		} while ((i < solutionQtt) && (part < limit));
+		return p;
+	}
+
 	// [20]
-	public void onlookerBeePhase20(int onlQtt, int empQtt, Measure measure) {
+	public void onlookerBeePhase20(Measure measure) {
 		System.out.println("------");
-		Rank rank = new Rank(solutionList.subList(0, empQtt), measure);
-		Portfolio p1, p2;
-		int total = empQtt + onlQtt;
-		for (int i = empQtt; i < total; i++) {
-			p1 = solutionList.get(i);
-			p2 = rank.lottery();
+		Portfolio p2;
+		for (Portfolio p1 : solutionList) {
+			p2 = lottery(measure);
 			System.out.println(p2.id);
-			
 			if (measure.getComparator().compare(p1, p2) > 0) {
 				System.out.println("onlooker");
 				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
-					e.getRelation().coverList.set(i, e.getRelation().coverList.get(p2.id));
+					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(p2.id));
 				}
 			}
 		}
@@ -170,17 +189,16 @@ public class CoverGraph {
 	}
 
 	// [20]
-	public void employedBeePhase20(int empQtt, double alfa, int c, Measure measure) {
+	public void employedBeePhase20(double alfa, int c, Measure measure) {
 		calcSemiVarAndSkewnessForAll();
 		calcMaxAndMinForAll();
 		double newCover;
-		Rank rank = new Rank(solutionList.subList(0, empQtt), measure);
-		Portfolio p1, p2;
+		Rank rank = new Rank(solutionList, measure);
+		Portfolio p2,pNew;
 		int bestId = rank.getFirst().id;
 
-		for (int i = 0; i < empQtt; i++) {
-			p1 = solutionList.get(i);
-			p2 = rank.lottery();
+		for (Portfolio p1 : solutionList) {
+			p2 = lottery(measure);
 			p1.trail++;
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
 				newCover = e.getRelation().coverList.get(p1.id)
@@ -188,22 +206,30 @@ public class CoverGraph {
 								* (e.getRelation().coverList.get(p1.id) - e.getRelation().coverList.get(p2.id))
 						+ new Random().nextInt(c + 1)
 								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
-				
-				if (newCover > 0) {
-					p1.trail = 0;
-					e.getRelation().coverList.set(p1.id, newCover);
+					e.getRelation().coverList.add(Math.max(0, newCover));
+			}
+			pNew = new Portfolio(graph.getEdgeList().get(0).getRelation().coverList.size()-1);
+			normalize(pNew.id);
+			calcMeanReturn(pNew);
+			calcSemiVarAndSkewness(pNew);
+			calcMaxAndMin(pNew);
+			if(measure.getComparator().compare(p1, pNew) > 0){
+				p1.trail = 0;
+				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(pNew.id));
+					e.getRelation().coverList.remove(pNew.id);
 				}
 			}
-			normalize(p1.id);
 		}
 	}
 
-	public String formatHeader(Measure measure){
-		String header = "id,"+measure.getClass().getSimpleName()+",Mean,SemiVar";
-		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) header += ","+v.getContent().tradeCode;
+	public String formatHeader(Measure measure) {
+		String header = "id," + measure.getClass().getSimpleName() + ",Mean,SemiVar";
+		for (Vertex<StockLog, CoverLink> v : graph.getVertexList())
+			header += "," + v.getContent().tradeCode;
 		return header;
 	}
-	
+
 	public String formatResult(Measure measure) {
 		Rank rank = new Rank(solutionList, measure);
 		DecimalFormat df = new DecimalFormat("#0.000000");
@@ -211,10 +237,10 @@ public class CoverGraph {
 		String text = "";
 
 		Portfolio p;
-	
+
 		for (int i = 0; i < 3; i++) {
 			p = rank.rankedList.get(i);
-			text += p.id + "," + df.format(measure.getValue(p)) + ","+ df.format(p.mean) + "," + df.format(p.semiVar) ;
+			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.semiVar);
 			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
@@ -227,14 +253,14 @@ public class CoverGraph {
 		return text;
 	}
 
-	public String getMeanAndSemiVar(){
+	public String getMeanAndSemiVar() {
 		String out = "";
-		for(Portfolio p : solutionList){
-			out += p.mean+","+p.semiVar+"\n";
+		for (Portfolio p : solutionList) {
+			out += p.mean + "," + p.semiVar + "\n";
 		}
 		return out;
 	}
-	
+
 	public void printResult(Measure measure) {
 		System.out.print(formatResult(measure));
 		System.out.println("------------");
@@ -292,14 +318,13 @@ public class CoverGraph {
 	public void crossOver10(int coupleQtt, Measure measure) {
 		calcSemiVarAndSkewnessForAll();
 		calcMaxAndMinForAll();
-		Rank rank = new Rank(solutionList, measure);
 		Portfolio solution1, solution2;
 		int id, i = 0;
 		double cover1, cover2, rand, beta;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = rank.lottery();
-			solution2 = rank.lottery();
+			solution1 = lottery(measure);
+			solution2 = lottery(measure);
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
@@ -324,14 +349,13 @@ public class CoverGraph {
 	public void crossOver16(int coupleQtt, Measure measure) {
 		calcSemiVarAndSkewnessForAll();
 		calcMaxAndMinForAll();
-		Rank rank = new Rank(solutionList, measure);
 		Portfolio solution1, solution2;
 		int id, i = 0;
 		double c1, c2, rand;
 		while (i < coupleQtt) {
 			i++;
-			solution1 = rank.lottery();
-			solution2 = rank.lottery();
+			solution1 = lottery(measure);
+			solution2 = lottery(measure);
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
 			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
@@ -414,57 +438,66 @@ public class CoverGraph {
 		}
 	}
 
-	public void calcSemiVarAndSkewnessForAll() {
+	public void calcSemiVarAndSkewness(Portfolio p) {
 		calcMeanReturnForAll();
 		double term, semiTerm, skewTerm, varTerm, weight;
 		List<Double> dayReturnList;
+		dayReturnList = new ArrayList<>();
+		for (int i = 0; i < dayList.size(); i++) {
+			dayReturnList.add(0.0);
+		}
+		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+			weight = 0;
+			for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+				weight += e.getRelation().coverList.get(p.id);
+			}
+			int t = 0;
+			for (Double r : v.getContent().returnLog) {
+				term = r * weight + dayReturnList.get(t);
+				dayReturnList.set(t, term);
+				t++;
+			}
+		}
+		semiTerm = 0;
+		skewTerm = 0;
+		varTerm = 0;
+		for (Double d : dayReturnList) {
+			semiTerm += Math.min(0, (d - p.mean)) * Math.min(0, (d - p.mean));
+			varTerm += (d - p.mean) * (d - p.mean);
+		}
+		p.semiVar = semiTerm / (dayReturnList.size() - 1);
+		varTerm /= (dayReturnList.size() - 1);
+		for (Double d : dayReturnList) {
+			skewTerm += Math.pow((d - p.mean) / Math.pow(varTerm, 1 / 2), 3);
+		}
+		p.semiVar = semiTerm / (dayReturnList.size() - 1);
+		p.skewness = skewTerm / (dayReturnList.size() - 1);
+	}
+
+	public void calcSemiVarAndSkewnessForAll() {
+		calcMeanReturnForAll();
 		for (Portfolio p : solutionList) {
-			dayReturnList = new ArrayList<>();
-			for (int i = 0; i < dayList.size(); i++) {
-				dayReturnList.add(0.0);
-			}
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				weight = 0;
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
-					weight += e.getRelation().coverList.get(p.id);
-				}
-				int t = 0;
-				for (Double r : v.getContent().returnLog) {
-					term = r * weight + dayReturnList.get(t);
-					dayReturnList.set(t, term);
-					t++;
-				}
-			}
-			semiTerm = 0;
-			skewTerm = 0;
-			varTerm = 0;
-			for (Double d : dayReturnList) {
-				semiTerm += Math.min(0, (d - p.mean)) * Math.min(0, (d - p.mean));
-				varTerm += (d - p.mean) * (d - p.mean);
-			}
-			p.semiVar = semiTerm / (dayReturnList.size() - 1);
-			varTerm /= (dayReturnList.size() - 1);
-			for (Double d : dayReturnList) {
-				skewTerm += Math.pow((d - p.mean) / Math.pow(varTerm, 1 / 2), 3);
-			}
-			p.semiVar = semiTerm / (dayReturnList.size() - 1);
-			p.skewness = skewTerm / (dayReturnList.size() - 1);
+			calcSemiVarAndSkewness(p);
 		}
 	}
 
 	public void calcMeanReturnForAll() {
-		double term, weight;
 		for (Portfolio p : solutionList) {
-			term = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				weight = 0;
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
-					weight += e.getRelation().coverList.get(p.id);
-				}
-				term += (v.getContent().mean * weight);
-			}
-			p.mean = term;
+			calcMeanReturn(p);
 		}
+	}
+
+	public void calcMeanReturn(Portfolio p) {
+		double term, weight;
+		term = 0;
+		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+			weight = 0;
+			for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+				weight += e.getRelation().coverList.get(p.id);
+			}
+			term += (v.getContent().mean * weight);
+		}
+		p.mean = term;
 	}
 
 	private void init(String fileName) throws IOException {

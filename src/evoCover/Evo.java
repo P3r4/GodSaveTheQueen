@@ -21,8 +21,8 @@ public class Evo {
 		PrintWriter writer = new PrintWriter(resultDir +solQtt+"_"+genQtt+"_evo20_"+ measure.getClass().getSimpleName() + "_result.csv");
 		writer.println(graph.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
-			graph.employedBeePhase20(Math.floorDiv(solQtt, 2), alfa, c, measure);
-			graph.onlookerBeePhase20(Math.floorDiv(solQtt, 2), Math.floorDiv(solQtt, 2), measure);
+			graph.employedBeePhase20(alfa, c, measure);
+			graph.onlookerBeePhase20(measure);
 			graph.scoutBeePhase20(Math.floorDiv(solQtt, 2), limit);
 			writer.print(graph.formatResult(measure));
 		}

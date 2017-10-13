@@ -24,6 +24,7 @@ public class TestEvoCoverGraph {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit();
 		graph.calcSemiVarAndSkewnessForAll();
+		graph.calcMaxAndMinForAll();
 		graph.crossOver10(5,new Mean());
 		assertEquals(10,graph.getSolutionList().size());
 
@@ -90,7 +91,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(40.0,greatT,0.00000000001);
 		
-		graph.employedBeePhase20(20, 0.06 , 2, new Mean());
+		graph.employedBeePhase20(0.06 , 2, new Mean());
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
@@ -130,7 +131,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		
-		graph.onlookerBeePhase20(5, 5, new SemiVariance());
+		graph.onlookerBeePhase20(new SemiVariance());
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
