@@ -143,6 +143,8 @@ public class CoverGraph {
 		for (int i = empQtt; i < total; i++) {
 			p1 = solutionList.get(i);
 			p2 = rank.lottery();
+			System.out.println(p2.id);
+			
 			if (measure.getComparator().compare(p1, p2) > 0) {
 				System.out.println("onlooker");
 				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
@@ -175,7 +177,6 @@ public class CoverGraph {
 		Rank rank = new Rank(solutionList.subList(0, empQtt), measure);
 		Portfolio p1, p2;
 		int bestId = rank.getFirst().id;
-		double z;
 
 		for (int i = 0; i < empQtt; i++) {
 			p1 = solutionList.get(i);
@@ -188,9 +189,7 @@ public class CoverGraph {
 						+ new Random().nextInt(c + 1)
 								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
 				
-				z = Math.round(1 / (1 + Math.exp(-1 * newCover)) - alfa);
-				if ((z == 1.0) && (newCover > 0)) {
-					
+				if (newCover > 0) {
 					p1.trail = 0;
 					e.getRelation().coverList.set(p1.id, newCover);
 				}
@@ -202,7 +201,7 @@ public class CoverGraph {
 	public String formatHeader(Measure measure){
 		String header = "id,"+measure.getClass().getSimpleName()+",Mean,SemiVar";
 		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) header += ","+v.getContent().tradeCode;
-		return header+"\n";
+		return header;
 	}
 	
 	public String formatResult(Measure measure) {
@@ -210,7 +209,11 @@ public class CoverGraph {
 		DecimalFormat df = new DecimalFormat("#0.000000");
 		double weight;
 		String text = "";
-		for (Portfolio p : rank.rankedList) {
+
+		Portfolio p;
+	
+		for (int i = 0; i < 3; i++) {
+			p = rank.rankedList.get(i);
 			text += p.id + "," + df.format(measure.getValue(p)) + ","+ df.format(p.mean) + "," + df.format(p.semiVar) ;
 			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
 				weight = 0;
