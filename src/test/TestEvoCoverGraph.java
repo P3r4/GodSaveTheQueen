@@ -22,7 +22,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testCrossOver10() throws IOException {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
 		graph.calcMaxAndMinForAll();
 		graph.crossOver10(5,new Mean());
@@ -47,7 +47,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testCrossOver16() throws IOException {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
 		graph.crossOver16(5, new Mean());
 		assertEquals(10,graph.getSolutionList().size());
@@ -73,7 +73,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testEmpBee20() throws IOException{
 		CoverGraph graph = new CoverGraph(40, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
 		
 		String p1 = "",p2 = "";
@@ -113,7 +113,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testOnlBee20() throws IOException{
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
 		
 		String p1 = "",p2 = "";
@@ -152,7 +152,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testMutation10() throws IOException {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcMeanReturnForAll();
 		
 		String p1 = "",p2 = "";
@@ -190,7 +190,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testMutation16() throws IOException {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcMeanReturnForAll();
 		
 		String p1 = "",p2 = "";
@@ -229,7 +229,7 @@ public class TestEvoCoverGraph {
 	@Test
 	public void testMutation15() throws IOException {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
-		graph.randomInit();
+		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
 		
 		String p1 = "",p2 = "";

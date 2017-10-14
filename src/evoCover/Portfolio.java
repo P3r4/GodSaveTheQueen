@@ -37,7 +37,7 @@ public class Portfolio {
 	}
 
 	public Double getSortinoRatio() {
-		return mean / semiVar;
+		return (mean + 1) / semiVar;
 	}
 
 }

@@ -26,9 +26,8 @@ public class EvoCover {
 	}
 
 	public static void main(String[] args) {
-		int solQtt = -1, genQtt = -1, evo = -1, c = -1, limit = -1;
+		int solQtt = -1, wQtt = -1, genQtt = -1, evo = -1, c = -1, limit = -1;
 		String logFile = null, resDir = null, measure = null;
-		double alfa = -1.0;
 
 		int i;
 		i = getAttIndex(args, "-me");
@@ -37,6 +36,14 @@ public class EvoCover {
 			return;
 		} else {
 			measure = args[i + 1];
+		}
+		
+		i = getAttIndex(args, "-wQtt");
+		if (i == args.length) {
+			System.out.println("err: -wQtt not set");
+			return;
+		} else {
+			wQtt = Integer.parseInt(args[i + 1]);
 		}
 		
 		i = getAttIndex(args, "-logFile");
@@ -120,15 +127,15 @@ public class EvoCover {
 		try {
 			Evo e = new Evo(solQtt, logFile, resDir);			
 			if (evo == 20) {
-				e.evo20(genQtt, c, limit,m);
+				e.evo20(wQtt, genQtt, c, limit,m);
 			} else if (evo == 10) {
-				e.evo10(genQtt,m);
+				e.evo10(wQtt,genQtt,m);
 			} else if (evo == 16) {
-				e.evo16(genQtt, m);
+				e.evo16(wQtt,genQtt, m);
 			} else if (evo == 1015) {
-				e.evo1015(genQtt,m);
+				e.evo1015(wQtt,genQtt,m);
 			} else if (evo == 1615) {
-				e.evo1615(genQtt, m);
+				e.evo1615(wQtt,genQtt, m);
 			} else{
 				System.out.println("err:  invalid -evo");
 				return;
