@@ -6,7 +6,7 @@ import java.io.File;
 
 import org.junit.Test;
 
-import dataDigest.bovespa.BovespaDigest;
+import data.bovespa.BovespaDigest;
 
 public class TestBovespaDigest {
 

@@ -1,4 +1,4 @@
-package dataDigest.bovespa;
+package data.bovespa;
 
 public class BovespaLog {
 

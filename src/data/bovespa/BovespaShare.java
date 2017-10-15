@@ -1,4 +1,4 @@
-package dataDigest.bovespa;
+package data.bovespa;
 
 import java.util.HashMap;
 import java.util.Map;

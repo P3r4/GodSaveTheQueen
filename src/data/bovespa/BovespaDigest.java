@@ -1,4 +1,4 @@
-package dataDigest.bovespa;
+package data.bovespa;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

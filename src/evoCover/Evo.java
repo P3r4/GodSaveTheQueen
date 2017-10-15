@@ -23,7 +23,7 @@ public class Evo {
 		for (int i = 0; i < genQtt; i++) {
 			graph.employedBeePhase20(c, measure);
 			graph.onlookerBeePhase20(measure);
-			graph.scoutBeePhase20(14,limit);
+			graph.scoutBeePhase20(wQtt,limit);
 			writer.print(graph.formatResult(measure));
 		}
 		writer.close();
