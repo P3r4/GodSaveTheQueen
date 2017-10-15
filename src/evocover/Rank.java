@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 public class Rank {
 
@@ -28,8 +27,5 @@ public class Rank {
 	public Portfolio getFirst(){
 		return rankedList.get(0);
 	}
-
-	
-
 	
 }

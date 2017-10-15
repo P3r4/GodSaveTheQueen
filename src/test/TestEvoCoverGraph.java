@@ -8,9 +8,8 @@ import org.junit.Test;
 
 import evocover.Cover;
 import evocover.CoverGraph;
-import evocover.Mean;
+import evocover.Measure;
 import evocover.Portfolio;
-import evocover.SemiVariance;
 import evocover.StockLog;
 import graph.Edge;
 import graph.Vertex;
@@ -25,7 +24,7 @@ public class TestEvoCoverGraph {
 		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
 		graph.calcMaxAndMinForAll();
-		graph.crossOver10(5,new Mean());
+		graph.crossOver10(5,Measure.Mean);
 		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
@@ -49,7 +48,7 @@ public class TestEvoCoverGraph {
 		CoverGraph graph = new CoverGraph(10, "./samples/filteredCSV/part1.csv");
 		graph.randomInit(14);
 		graph.calcSemiVarAndSkewnessForAll();
-		graph.crossOver16(5, new Mean());
+		graph.crossOver16(5, Measure.Mean);
 		assertEquals(10,graph.getSolutionList().size());
 
 		double total, greatT = 0;
@@ -91,7 +90,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(40.0,greatT,0.00000000001);
 		
-		graph.employedBeePhase20( 2, new Mean());
+		graph.employedBeePhase20( 2,  Measure.Mean);
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
@@ -131,7 +130,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		
-		graph.onlookerBeePhase20(new SemiVariance());
+		graph.onlookerBeePhase20( Measure.SemiVar);
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {

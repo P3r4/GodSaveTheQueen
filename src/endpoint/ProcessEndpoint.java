@@ -1,15 +1,8 @@
 package endpoint;
 
 import java.io.IOException;
-
-import evocover.Delta;
-import evocover.HV;
-import evocover.Mean;
 import evocover.Measure;
 import evocover.Process;
-import evocover.SemiVariance;
-import evocover.Skewness;
-import evocover.SortinoRatio;
 
 public class ProcessEndpoint implements Endpoint{
 	
@@ -69,17 +62,17 @@ public class ProcessEndpoint implements Endpoint{
 		}
 
 		if (me.equals("semivar")) {
-			measure = new SemiVariance();
+			measure = Measure.SemiVar;
 		} else if (me.equals("mean")) {
-			measure = new Mean();
+			measure = Measure.Mean;
 		} else if (me.equals("delta")) {
-			measure = new Delta();
+			measure = Measure.Delta;
 		} else if (me.equals("sortino")) {
-			measure = new SortinoRatio();
+			measure = Measure.SortinoRatio;
 		} else if (me.equals("hv")) {
-			measure = new HV();
+			measure = Measure.HV;
 		} else if (me.equals("skewness")) {
-			measure = new Skewness();
+			measure = Measure.Skewness;
 		} else {
 			return "err: invalid -me ";
 		}
