@@ -3,7 +3,7 @@ package endpoint;
 import java.io.IOException;
 
 import evoCover.Delta;
-import evoCover.Evo;
+import evoCover.Process;
 import evoCover.HV;
 import evoCover.Mean;
 import evoCover.Measure;
@@ -90,17 +90,17 @@ public class ProcessEndpoint implements Endpoint{
 	public String run() {
 		
 		try {
-			Evo e = new Evo(solQtt, logFile, resDir);
+			Process p = new Process(solQtt, logFile, resDir);
 			if (evo == 20) {
-				e.evo20(wQtt, genQtt, c, limit, measure);
+				p.evo20(wQtt, genQtt, c, limit, measure);
 			} else if (evo == 10) {
-				e.evo10(wQtt, genQtt, measure);
+				p.evo10(wQtt, genQtt, measure);
 			} else if (evo == 16) {
-				e.evo16(wQtt, genQtt, measure);
+				p.evo16(wQtt, genQtt, measure);
 			} else if (evo == 1015) {
-				e.evo1015(wQtt, genQtt, measure);
+				p.evo1015(wQtt, genQtt, measure);
 			} else if (evo == 1615) {
-				e.evo1615(wQtt, genQtt, measure);
+				p.evo1615(wQtt, genQtt, measure);
 			} else {
 				return "err:  invalid -evo";
 			}
