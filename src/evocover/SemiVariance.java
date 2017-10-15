@@ -1,20 +1,20 @@
-package evoCover;
+package evocover;
 
 import java.util.Comparator;
 
-public class HV implements Measure {
-	
+public class SemiVariance implements Measure{
+
 	@Override
 	public Double getValue(Portfolio p) {
-		return p.getHyperVolume();
+		return p.getSemiVar();
 	}
+	
 	@Override
 	public Comparator<Portfolio> getComparator() {
 		return new Comparator<Portfolio>() {
 			@Override
 			public int compare(Portfolio o1, Portfolio o2) {
-				Double hv = o2.getHyperVolume();
-				return hv.compareTo(o1.getHyperVolume());
+				return o1.semiVar.compareTo(o2.semiVar);
 			}
 		};
 	}

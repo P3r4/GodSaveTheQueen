@@ -18,7 +18,7 @@ public class BovespaDigest {
 	List<String> marketCodeList;
 	int size;
 	List<BovespaLog> bovespaLogList;
-	Map<String, BovespaShare> bovespaShareMap;
+	Map<String, BovespaStock> bovespaShareMap;
 	Set<Integer> logDaySet;
 	Set<String> tradeCodeSet;
 
@@ -69,7 +69,7 @@ public class BovespaDigest {
 		bovespaShareMap = new HashMap<>();
 		for (BovespaLog log : bovespaLogList) {
 			if (marketCodeCondition(log)) {
-				bovespaShareMap.put(log.tradeCode, new BovespaShare(log.tradeCode));
+				bovespaShareMap.put(log.tradeCode, new BovespaStock(log.tradeCode));
 			}
 		}
 

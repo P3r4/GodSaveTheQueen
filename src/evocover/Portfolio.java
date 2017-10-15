@@ -1,4 +1,4 @@
-package evoCover;
+package evocover;
 
 public class Portfolio {
 	int id;

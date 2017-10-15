@@ -1,4 +1,4 @@
-package evoCover;
+package evocover;
 
 import java.util.ArrayList;
 

@@ -2,8 +2,8 @@ package endpoint;
 
 import java.io.IOException;
 
-import evoCover.CoverGraph;
-import evoCover.Filter;
+import evocover.CoverGraph;
+import evocover.Filter;
 
 public class FilterEndpoint implements Endpoint{
 

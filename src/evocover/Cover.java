@@ -1,15 +1,15 @@
-package evoCover;
+package evocover;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoverLink {
+public class Cover {
 
 	double correlation;
 	List<Double> coverList;
 	int flag;
 	
-	public CoverLink(){
+	public Cover(){
 		coverList = new ArrayList<>();
 	}
 	

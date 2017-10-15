@@ -3,12 +3,12 @@ package data.bovespa;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BovespaShare {
+public class BovespaStock {
 
 	String tradeCode;
 	Map<Integer,BovespaLog> logDayMap;
 	
-	public BovespaShare(String tradeCode){
+	public BovespaStock(String tradeCode){
 		this.logDayMap =  new HashMap<>();
 		this.tradeCode = tradeCode;
 	}	

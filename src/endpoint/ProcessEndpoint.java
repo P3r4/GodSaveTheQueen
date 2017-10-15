@@ -2,14 +2,14 @@ package endpoint;
 
 import java.io.IOException;
 
-import evoCover.Delta;
-import evoCover.Process;
-import evoCover.HV;
-import evoCover.Mean;
-import evoCover.Measure;
-import evoCover.SemiVariance;
-import evoCover.Skewness;
-import evoCover.SortinoRatio;
+import evocover.Delta;
+import evocover.HV;
+import evocover.Mean;
+import evocover.Measure;
+import evocover.Process;
+import evocover.SemiVariance;
+import evocover.Skewness;
+import evocover.SortinoRatio;
 
 public class ProcessEndpoint implements Endpoint{
 	

@@ -6,12 +6,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import evoCover.CoverGraph;
-import evoCover.CoverLink;
-import evoCover.Mean;
-import evoCover.StockLog;
-import evoCover.Portfolio;
-import evoCover.SemiVariance;
+import evocover.Cover;
+import evocover.CoverGraph;
+import evocover.Mean;
+import evocover.Portfolio;
+import evocover.SemiVariance;
+import evocover.StockLog;
 import graph.Edge;
 import graph.Vertex;
 
@@ -31,8 +31,8 @@ public class TestEvoCoverGraph {
 		double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 				}
 			}
@@ -55,8 +55,8 @@ public class TestEvoCoverGraph {
 		double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 				}
 			}
@@ -80,8 +80,8 @@ public class TestEvoCoverGraph {
     	double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -96,8 +96,8 @@ public class TestEvoCoverGraph {
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -120,8 +120,8 @@ public class TestEvoCoverGraph {
     	double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -136,8 +136,8 @@ public class TestEvoCoverGraph {
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -159,8 +159,8 @@ public class TestEvoCoverGraph {
     	double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -174,8 +174,8 @@ public class TestEvoCoverGraph {
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -198,8 +198,8 @@ public class TestEvoCoverGraph {
 		double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -213,8 +213,8 @@ public class TestEvoCoverGraph {
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -236,8 +236,8 @@ public class TestEvoCoverGraph {
     	double total, greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p1+= e.getRelation().getCoverValue(p.getId());
 				}
@@ -251,8 +251,8 @@ public class TestEvoCoverGraph {
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {
 			total = 0;
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					total += e.getRelation().getCoverValue(p.getId());
 					p2+= e.getRelation().getCoverValue(p.getId());
 				}

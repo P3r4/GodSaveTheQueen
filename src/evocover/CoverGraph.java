@@ -1,4 +1,4 @@
-package evoCover;
+package evocover;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -6,74 +6,47 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Random;
 import graph.*;
 
 public class CoverGraph {
 
 	List<Portfolio> solutionList;
-	Graph<StockLog, CoverLink> graph;
+	Graph<StockLog, Cover> graph;
 	List<Integer> dayList;
 	String fileName;
 	int solutionQtt;
 	String plotData;
 
 	public CoverGraph(int sqtt, String fileName) throws IOException {
+		initGraph(fileName);
+		initAllRelations();
 		solutionQtt = sqtt;
 		solutionList = new ArrayList<>();
 		for (int i = 0; i < solutionQtt; i++) {
 			solutionList.add(new Portfolio(i));
 		}
-		init(fileName);
-		initAllRelations();
 	}
 
 	public List<Portfolio> getSolutionList() {
 		return solutionList;
 	}
 
-	public void markGraph(double corrTLimit, double meanBLimit, double semiVarTLimit) {
-
-		for (Vertex<StockLog, CoverLink> vertex : graph.getVertexList()) {
-			if (vertex.getContent().mean < meanBLimit && vertex.getContent().variance > semiVarTLimit) {
-				vertex.getContent().flag = 1;
-			} else if(vertex.getContent().mean < meanBLimit) {
-				vertex.getContent().flag = 2;
-			} else if(vertex.getContent().variance > semiVarTLimit) {
-				vertex.getContent().flag = 3;
-			} else{
-				vertex.getContent().flag = 4;
-			}
-		}
-
-		for (Edge<StockLog, CoverLink> edge : this.graph.getEdgeList()) {
-			if (edge.getRelation().correlation > corrTLimit) {
-				edge.getRelation().flag = 0;
-			} else {
-				edge.getRelation().flag = 1;
-			}
-		}
-
-	}
-
 	private void initAllRelations() {
 		int j;
-		CoverLink link;
+		Cover link;
 		int size = graph.getVertexList().size();
 		double corr;
 		for (int i = 0; i < size; i++) {
 			j = i + 1;
 			while (j < size) {
 				corr = graph.getContent(i).calcCorrelation(graph.getContent(j));
-				link = new CoverLink();
+				link = new Cover();
 				link.correlation = corr;
 				graph.addRelation(i, j, link);
-				link = new CoverLink();
+				link = new Cover();
 				link.correlation = corr;
 				graph.addRelation(j, i, link);
 				j++;
@@ -81,14 +54,14 @@ public class CoverGraph {
 		}
 	}
 
-	public List<Vertex<StockLog, CoverLink>> getVertexList() {
+	public List<Vertex<StockLog, Cover>> getVertexList() {
 		return graph.getVertexList();
 	}
 
 	public void randomInit(int wQtt) {
 
-		for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
-			CoverLink link = e.getRelation();
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+			Cover link = e.getRelation();
 			for (int i = 0; i < solutionQtt; i++) {
 				link.coverList.add(0.0);
 			}
@@ -106,8 +79,8 @@ public class CoverGraph {
 		Integer r;
 		for (int k = 0; k < wQtt; k++) {
 			r = new Random().nextInt(graph.getVertexList().size());
-			for (Edge<StockLog, CoverLink> e : graph.getVertexList().get(r).getEdgeList()) {
-				CoverLink link = e.getRelation();
+			for (Edge<StockLog, Cover> e : graph.getVertexList().get(r).getEdgeList()) {
+				Cover link = e.getRelation();
 				link.coverList.set(id, Math.pow(new Random().nextInt(10) + 1, new Random().nextInt(4)));
 			}
 		}
@@ -118,12 +91,12 @@ public class CoverGraph {
 	public void normalize(int solutionId) {
 		double total, normCover;
 		total = 0;
-		for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
-			CoverLink link = e.getRelation();
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+			Cover link = e.getRelation();
 			total += link.coverList.get(solutionId);
 		}
-		for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
-			CoverLink link = e.getRelation();
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+			Cover link = e.getRelation();
 			normCover = link.coverList.get(solutionId) / total;
 			link.coverList.set(solutionId, normCover);
 		}
@@ -144,15 +117,15 @@ public class CoverGraph {
 	public void calcMaxAndMin(Portfolio p) {
 		double w;
 		w = 0;
-		Vertex<StockLog, CoverLink> v0 = graph.getVertexList().get(0);
-		for (Edge<StockLog, CoverLink> e : v0.getEdgeList()) {
+		Vertex<StockLog, Cover> v0 = graph.getVertexList().get(0);
+		for (Edge<StockLog, Cover> e : v0.getEdgeList()) {
 			w += e.getRelation().coverList.get(p.id);
 		}
 		p.maxW = w;
 		p.minW = w;
-		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
 			w = 0;
-			for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 				w += e.getRelation().coverList.get(p.id);
 			}
 			if (p.maxW < w)
@@ -207,7 +180,7 @@ public class CoverGraph {
 			p2 = lottery(measure);
 			if (measure.getComparator().compare(p1, p2) > 0) {
 				System.out.println(p2.id + " onlooker");
-				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(p2.id));
 				}
 			}
@@ -215,7 +188,7 @@ public class CoverGraph {
 	}
 	
 	public void zeroOne(int id){
-		for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 			e.getRelation().coverList.set(id,0.0);
 		}
 	}
@@ -245,7 +218,7 @@ public class CoverGraph {
 		for (Portfolio p1 : solutionList) {
 			p2 = lottery(measure);
 			p1.trail++;
-			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 				newCover = e.getRelation().coverList.get(p1.id)
 						+ new Random().nextDouble()
 								* (e.getRelation().coverList.get(p1.id) - e.getRelation().coverList.get(p2.id))
@@ -261,11 +234,11 @@ public class CoverGraph {
 			calcMaxAndMin(pNew);
 			if (measure.getComparator().compare(p1, pNew) > 0) {
 				p1.trail = 0;
-				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(pNew.id));
 				}
 			}
-			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 				e.getRelation().coverList.remove(pNew.id);
 			}
 		}
@@ -273,7 +246,7 @@ public class CoverGraph {
 
 	public String formatHeader(Measure measure) {
 		String header = "id," + measure.getClass().getSimpleName() + ",Mean,SemiVar";
-		for (Vertex<StockLog, CoverLink> v : graph.getVertexList())
+		for (Vertex<StockLog, Cover> v : graph.getVertexList())
 			header += "," + v.getContent().tradeCode;
 		return header;
 	}
@@ -289,9 +262,9 @@ public class CoverGraph {
 		for (int i = 0; i < 3; i++) {
 			p = rank.rankedList.get(i);
 			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.semiVar);
-			for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
 				weight = 0;
-				for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 					weight += e.getRelation().coverList.get(p.id);
 				}
 				text += "," + df.format(weight);
@@ -345,7 +318,7 @@ public class CoverGraph {
 		int k = 0;
 		for (Portfolio p : rankedList) {
 			if (p.id >= solutionQtt) {
-				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 					e.getRelation().coverList.set(swapList.get(k).id, e.getRelation().coverList.get(p.id));
 				}
 				p.id = swapList.get(k).id;
@@ -355,7 +328,7 @@ public class CoverGraph {
 	}
 
 	public void fixCoverListForAllEdges(int coupleQtt) {
-		for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 			for (int i = 0; i < coupleQtt * 2; i++) {
 				e.getRelation().coverList.remove(e.getRelation().coverList.size() - 1);
 			}
@@ -375,7 +348,7 @@ public class CoverGraph {
 			solution2 = lottery(measure);
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
-			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 				cover1 = e.getRelation().coverList.get(solution1.id);
 				cover2 = e.getRelation().coverList.get(solution2.id);
 				if (rand <= 0.5)
@@ -406,7 +379,7 @@ public class CoverGraph {
 			solution2 = lottery(measure);
 			rand = new Random().nextDouble();
 			id = graph.getEdgeList().get(0).getRelation().coverList.size();
-			for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 				c1 = e.getRelation().coverList.get(solution1.id);
 				c2 = e.getRelation().coverList.get(solution2.id);
 				e.getRelation().coverList.add(rand * c1 + (1 - rand) * c2);
@@ -428,7 +401,7 @@ public class CoverGraph {
 		int i;
 		for (Portfolio p : solutionList) {
 			i = 0;
-			for (Edge<StockLog, CoverLink> e1 : graph.getEdgeList()) {
+			for (Edge<StockLog, Cover> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
 					rand = new Random().nextDouble();
 					cover = e1.getRelation().coverList.get(p.id);
@@ -456,7 +429,7 @@ public class CoverGraph {
 		int e2Id;
 		double chance = 1.0 / graph.getEdgeList().size();
 		for (Portfolio p : solutionList) {
-			for (Edge<StockLog, CoverLink> e1 : graph.getEdgeList()) {
+			for (Edge<StockLog, Cover> e1 : graph.getEdgeList()) {
 				if (new Random().nextDouble() < chance) {
 					tradeE1 = e1.getRelation().coverList.get(p.id);
 					e2Id = new Random().nextInt(graph.getEdgeList().size());
@@ -474,7 +447,7 @@ public class CoverGraph {
 		double newCover;
 		for (Portfolio p : solutionList) {
 			if (new Random().nextDouble() < chance) {
-				for (Edge<StockLog, CoverLink> e : graph.getEdgeList()) {
+				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
 					newCover = e.getRelation().coverList.get(p.id) * (new Random().nextDouble()) * 2;
 					e.getRelation().coverList.set(p.id, newCover);
 				}
@@ -491,9 +464,9 @@ public class CoverGraph {
 		for (int i = 0; i < dayList.size(); i++) {
 			dayReturnList.add(0.0);
 		}
-		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
 			weight = 0;
-			for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 				weight += e.getRelation().coverList.get(p.id);
 			}
 			int t = 0;
@@ -535,9 +508,9 @@ public class CoverGraph {
 	public void calcMeanReturn(Portfolio p) {
 		double term, weight;
 		term = 0;
-		for (Vertex<StockLog, CoverLink> v : graph.getVertexList()) {
+		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
 			weight = 0;
-			for (Edge<StockLog, CoverLink> e : v.getEdgeList()) {
+			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
 				weight += e.getRelation().coverList.get(p.id);
 			}
 			term += (v.getContent().mean * weight);
@@ -545,7 +518,7 @@ public class CoverGraph {
 		p.mean = term;
 	}
 
-	private void init(String fileName) throws IOException {
+	private void initGraph(String fileName) throws IOException {
 		graph = new Graph<>();
 		dayList = new ArrayList<>();
 		this.fileName = fileName;

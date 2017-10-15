@@ -3,7 +3,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import evoCover.StockLog;
+import evocover.StockLog;
 
 public class TestEvoCoverLog {
 	
