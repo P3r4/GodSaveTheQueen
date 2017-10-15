@@ -1,8 +1,11 @@
 package endpoint;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import evocover.Measure;
 import evocover.Process;
+import plot.PlotData;
 
 public class ProcessEndpoint implements Endpoint{
 	
@@ -83,20 +86,22 @@ public class ProcessEndpoint implements Endpoint{
 	public String run() {
 		
 		try {
+			PlotData data;
 			Process p = new Process(solQtt, logFile, resDir);
 			if (evo == 20) {
-				p.evo20(wQtt, genQtt, c, limit, measure);
+				data = p.evo20(wQtt, genQtt, c, limit, measure);
 			} else if (evo == 10) {
-				p.evo10(wQtt, genQtt, measure);
+				data = p.evo10(wQtt, genQtt, measure);
 			} else if (evo == 16) {
-				p.evo16(wQtt, genQtt, measure);
+				data = p.evo16(wQtt, genQtt, measure);
 			} else if (evo == 1015) {
-				p.evo1015(wQtt, genQtt, measure);
+				data = p.evo1015(wQtt, genQtt, measure);
 			} else if (evo == 1615) {
-				p.evo1615(wQtt, genQtt, measure);
+				data = p.evo1615(wQtt, genQtt, measure);
 			} else {
 				return "err:  invalid -evo";
 			}
+			data.print();
 			return "";
 		} catch (IOException e) {
 			return "err: " + e.getMessage();

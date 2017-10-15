@@ -1,5 +1,8 @@
 package plot;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
 public class PlotData {
 	
 	String fileName;
@@ -12,6 +15,12 @@ public class PlotData {
 	
 	public void add(String moreData){
 		this.data += moreData;
+	}
+	
+	public void print() throws FileNotFoundException{
+		PrintWriter writer = new PrintWriter(fileName);
+		writer.print(data);
+		writer.close();
 	}
 	
 }
