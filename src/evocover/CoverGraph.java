@@ -28,10 +28,25 @@ public class CoverGraph {
 		for (int i = 0; i < solutionQtt; i++) {
 			solutionList.add(new Portfolio(i));
 		}
+		
 	}
 
-	public List<Portfolio> getSolutionList() {
-		return solutionList;
+	private void initGraph(String fileName) throws IOException {
+		graph = new Graph<>();
+		dayList = new ArrayList<>();
+		this.fileName = fileName;
+		BufferedReader reader = new BufferedReader(new FileReader(fileName));
+		String line = reader.readLine();
+		String[] splitLine = line.split(",");
+		for (int i = 1; i < splitLine.length; i++) {
+			dayList.add(Integer.parseInt(splitLine[i]));
+		}
+		StockLog log;
+		while (((line = reader.readLine()) != null)) {
+			log = new StockLog(line);
+			graph.addContent(log);
+		}
+		reader.close();
 	}
 
 	private void initAllRelations() {
@@ -54,28 +69,7 @@ public class CoverGraph {
 		}
 	}
 
-	public List<Vertex<StockLog, Cover>> getVertexList() {
-		return graph.getVertexList();
-	}
-
-	public void randomInit(int wQtt) {
-
-		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-			Cover link = e.getRelation();
-			for (int i = 0; i < solutionQtt; i++) {
-				link.coverList.add(0.0);
-			}
-		}
-
-		for (int i = 0; i < solutionQtt; i++) {
-			randomOne(wQtt,i);
-		}
-
-		
-	}
-
 	public void randomOne(int wQtt, int id) {
-
 		Integer r;
 		for (int k = 0; k < wQtt; k++) {
 			r = new Random().nextInt(graph.getVertexList().size());
@@ -135,6 +129,84 @@ public class CoverGraph {
 		}
 
 	}
+	
+	public void calcSemiVarAndSkewness(Portfolio p) {
+		double term, semiTerm, skewTerm, varTerm, weight;
+		List<Double> dayReturnList;
+		dayReturnList = new ArrayList<>();
+		for (int i = 0; i < dayList.size(); i++) {
+			dayReturnList.add(0.0);
+		}
+		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+			weight = 0;
+			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
+				weight += e.getRelation().coverList.get(p.id);
+			}
+			int t = 0;
+			for (Double r : v.getContent().returnLog) {
+				term = r * weight + dayReturnList.get(t);
+				dayReturnList.set(t, term);
+				t++;
+			}
+		}
+		semiTerm = 0;
+		skewTerm = 0;
+		varTerm = 0;
+		for (Double d : dayReturnList) {
+			semiTerm += Math.min(0, (d - p.mean)) * Math.min(0, (d - p.mean));
+			varTerm += (d - p.mean) * (d - p.mean);
+		}
+		p.semiVar = semiTerm / (dayReturnList.size() - 1);
+		varTerm /= (dayReturnList.size() - 1);
+		for (Double d : dayReturnList) {
+			skewTerm += Math.pow((d - p.mean) / Math.pow(varTerm, 1 / 2), 3);
+		}
+		p.semiVar = semiTerm / (dayReturnList.size() - 1);
+		p.skewness = skewTerm / (dayReturnList.size() - 1);
+	}
+
+	public void calcSemiVarAndSkewnessForAll() {
+		calcMeanReturnForAll();
+		for (Portfolio p : solutionList) {
+			calcSemiVarAndSkewness(p);
+		}
+	}
+
+	public void calcMeanReturnForAll() {
+		for (Portfolio p : solutionList) {
+			calcMeanReturn(p);
+		}
+	}
+
+	public void calcMeanReturn(Portfolio p) {
+		double term, weight;
+		term = 0;
+		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+			weight = 0;
+			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
+				weight += e.getRelation().coverList.get(p.id);
+			}
+			term += (v.getContent().mean * weight);
+		}
+		p.mean = term;
+	}
+
+
+	public List<Portfolio> getSolutionList() {
+		return solutionList;
+	}
+
+
+	public List<Vertex<StockLog, Cover>> getVertexList() {
+		return graph.getVertexList();
+	}
+
+	
+	public void zeroOne(int id){
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+			e.getRelation().coverList.set(id,0.0);
+		}
+	}
 
 	public Portfolio lottery(Measure m) {
 		double total = 0;
@@ -173,81 +245,19 @@ public class CoverGraph {
 		return pOut;
 	}
 
-	// [20]
-	public void onlookerBeePhase20(Measure measure) {
-		Portfolio p2;
-		for (Portfolio p1 : solutionList) {
-			p2 = lottery(measure);
-			if (measure.getComparator().compare(p1, p2) > 0) {
-				System.out.println(p2.id + " onlooker");
-				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(p2.id));
-				}
-			}
-		}
-	}
+
 	
-	public void zeroOne(int id){
-		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-			e.getRelation().coverList.set(id,0.0);
-		}
-	}
-
-	public void scoutBeePhase20(int wQtt, int limit) {
-		for (int i = 0; i < solutionQtt; i++) {
-			if (solutionList.get(i).trail > limit) {
-				System.out.println("scout");
-				solutionList.get(i).trail = 0;
-				zeroOne(solutionList.get(i).id);
-				randomOne(wQtt, solutionList.get(i).id);
-				normalize(solutionList.get(i).id);
-			}
-		}
-
-	}
-
-	// [20]
-	public void employedBeePhase20(int c, Measure measure) {
-		calcSemiVarAndSkewnessForAll();
-		calcMaxAndMinForAll();
-		double newCover;
-		Rank rank = new Rank(solutionList, measure);
-		Portfolio p2, pNew;
-		int bestId = rank.getFirst().id;
-
-		for (Portfolio p1 : solutionList) {
-			p2 = lottery(measure);
-			p1.trail++;
-			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-				newCover = e.getRelation().coverList.get(p1.id)
-						+ new Random().nextDouble()
-								* (e.getRelation().coverList.get(p1.id) - e.getRelation().coverList.get(p2.id))
-						+ new Random().nextInt(c + 1)
-								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
-				e.getRelation().coverList.add(Math.max(0, newCover));
-				// System.out.println(newCover);
-			}
-			pNew = new Portfolio(graph.getEdgeList().get(0).getRelation().coverList.size() - 1);
-			normalize(pNew.id);
-			calcMeanReturn(pNew);
-			calcSemiVarAndSkewness(pNew);
-			calcMaxAndMin(pNew);
-			if (measure.getComparator().compare(p1, pNew) > 0) {
-				p1.trail = 0;
-				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(pNew.id));
-				}
-			}
-			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-				e.getRelation().coverList.remove(pNew.id);
-			}
-		}
+	public void calcAllMeasures(Portfolio p){
+		calcMeanReturn(p);
+		calcSemiVarAndSkewness(p);
+		calcMaxAndMin(p);
 	}
 
 	public String formatHeader(Measure measure) {
-		String header = "id," + measure.getClass().getSimpleName() + ",Mean,SemiVar";
+		String header = "id," + measure.toString() + ",Mean,SemiVar";
 		for (Vertex<StockLog, Cover> v : graph.getVertexList())
 			header += "," + v.getContent().tradeCode;
+		header += "\n";
 		return header;
 	}
 
@@ -334,11 +344,97 @@ public class CoverGraph {
 			}
 		}
 	}
+	
+	
+    //[15]
+	public void randomInit(int wQtt) {
+
+		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+			Cover link = e.getRelation();
+			for (int i = 0; i < solutionQtt; i++) {
+				link.coverList.add(0.0);
+			}
+		}
+
+		for (int i = 0; i < solutionQtt; i++) {
+			randomOne(wQtt,i);
+		}
+		calcSemiVarAndSkewnessForAll();
+		calcMaxAndMinForAll();
+	}
+	
+	// [20]
+	public void onlookerBeePhase20(Measure measure) {
+		Portfolio p2;
+		for (Portfolio p1 : solutionList) {
+			p2 = lottery(measure);
+			if (measure.getComparator().compare(p1, p2) > 0) {
+				System.out.println(p2.id + " onlooker");
+				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(p2.id));
+				}
+				p1.trail = 0;
+				calcAllMeasures(p1);
+			}
+		}
+	}
+
+	public void scoutBeePhase20(int wQtt, int limit) {
+		for (int i = 0; i < solutionQtt; i++) {
+			if (solutionList.get(i).trail > limit) {
+				System.out.println("scout");
+				solutionList.get(i).trail = 0;
+				zeroOne(solutionList.get(i).id);
+				randomOne(wQtt, solutionList.get(i).id);
+				normalize(solutionList.get(i).id);
+				calcAllMeasures(solutionList.get(i));
+			}
+		}
+		
+	}
+
+	// [20]
+	public void employedBeePhase20(int c, Measure measure) {
+		
+		double newCover;
+		Rank rank = new Rank(solutionList, measure);
+		Portfolio p1, p2, pNew;
+		int bestId = rank.getFirst().id;
+
+		
+		for (int i = 0; i < solutionList.size(); i++) {
+			p1 = solutionList.get(i);
+			p2 = lottery(measure);
+			p1.trail++;
+			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+				newCover = e.getRelation().coverList.get(p1.id)
+						+ new Random().nextDouble()
+								* (e.getRelation().coverList.get(p1.id) - e.getRelation().coverList.get(p2.id))
+						+ new Random().nextInt(c + 1)
+								* (e.getRelation().coverList.get(bestId) - e.getRelation().coverList.get(p1.id));
+				e.getRelation().coverList.add(Math.max(0, newCover));
+				// System.out.println(newCover);
+			}
+			pNew = new Portfolio(graph.getEdgeList().get(0).getRelation().coverList.size() - 1);
+			normalize(pNew.id);
+			calcAllMeasures(pNew);
+			int rmv = pNew.id;
+			if (measure.getComparator().compare(p1, pNew) > 0) {
+				for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+					e.getRelation().coverList.set(p1.id, e.getRelation().coverList.get(pNew.id));
+				}
+				pNew.trail = 0;
+				pNew.id = p1.id;
+				solutionList.set(i, pNew);
+			}
+			for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
+				e.getRelation().coverList.remove(rmv);
+			}
+		}
+	}
 
 	// [10]
 	public void crossOver10(int coupleQtt, Measure measure) {
-		calcSemiVarAndSkewnessForAll();
-		calcMaxAndMinForAll();
 		Portfolio solution1, solution2;
 		int id, i = 0;
 		double cover1, cover2, rand, beta;
@@ -395,7 +491,6 @@ public class CoverGraph {
 
 	// [10]
 	public void mutation10() {
-		calcMaxAndMinForAll();
 		double rand, deltaQ, delta, cover, newCover;
 		double chance = 1.0 / graph.getEdgeList().size();
 		int i;
@@ -420,6 +515,7 @@ public class CoverGraph {
 				i++;
 			}
 			normalize(p.id);
+			calcAllMeasures(p);
 		}
 	}
 
@@ -439,6 +535,7 @@ public class CoverGraph {
 				}
 			}
 			normalize(p.id);
+			calcAllMeasures(p);
 		}
 	}
 
@@ -453,87 +550,8 @@ public class CoverGraph {
 				}
 			}
 			normalize(p.id);
+			calcAllMeasures(p);
 		}
-	}
-
-	public void calcSemiVarAndSkewness(Portfolio p) {
-		calcMeanReturnForAll();
-		double term, semiTerm, skewTerm, varTerm, weight;
-		List<Double> dayReturnList;
-		dayReturnList = new ArrayList<>();
-		for (int i = 0; i < dayList.size(); i++) {
-			dayReturnList.add(0.0);
-		}
-		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
-			weight = 0;
-			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
-				weight += e.getRelation().coverList.get(p.id);
-			}
-			int t = 0;
-			for (Double r : v.getContent().returnLog) {
-				term = r * weight + dayReturnList.get(t);
-				dayReturnList.set(t, term);
-				t++;
-			}
-		}
-		semiTerm = 0;
-		skewTerm = 0;
-		varTerm = 0;
-		for (Double d : dayReturnList) {
-			semiTerm += Math.min(0, (d - p.mean)) * Math.min(0, (d - p.mean));
-			varTerm += (d - p.mean) * (d - p.mean);
-		}
-		p.semiVar = semiTerm / (dayReturnList.size() - 1);
-		varTerm /= (dayReturnList.size() - 1);
-		for (Double d : dayReturnList) {
-			skewTerm += Math.pow((d - p.mean) / Math.pow(varTerm, 1 / 2), 3);
-		}
-		p.semiVar = semiTerm / (dayReturnList.size() - 1);
-		p.skewness = skewTerm / (dayReturnList.size() - 1);
-	}
-
-	public void calcSemiVarAndSkewnessForAll() {
-		calcMeanReturnForAll();
-		for (Portfolio p : solutionList) {
-			calcSemiVarAndSkewness(p);
-		}
-	}
-
-	public void calcMeanReturnForAll() {
-		for (Portfolio p : solutionList) {
-			calcMeanReturn(p);
-		}
-	}
-
-	public void calcMeanReturn(Portfolio p) {
-		double term, weight;
-		term = 0;
-		for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
-			weight = 0;
-			for (Edge<StockLog, Cover> e : v.getEdgeList()) {
-				weight += e.getRelation().coverList.get(p.id);
-			}
-			term += (v.getContent().mean * weight);
-		}
-		p.mean = term;
-	}
-
-	private void initGraph(String fileName) throws IOException {
-		graph = new Graph<>();
-		dayList = new ArrayList<>();
-		this.fileName = fileName;
-		BufferedReader reader = new BufferedReader(new FileReader(fileName));
-		String line = reader.readLine();
-		String[] splitLine = line.split(",");
-		for (int i = 1; i < splitLine.length; i++) {
-			dayList.add(Integer.parseInt(splitLine[i]));
-		}
-		StockLog log;
-		while (((line = reader.readLine()) != null)) {
-			log = new StockLog(line);
-			graph.addContent(log);
-		}
-		reader.close();
 	}
 
 

@@ -8,6 +8,10 @@ public class PlotData {
 	String fileName;
 	String data;
 	
+	public String getData(){
+		return data;
+	}
+	
 	public PlotData(String fileName){
 		this.data = "";
 		this.fileName = fileName;
