@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# bash for loop
+evolist=( 10 20 16 1015 1615 )
+melist=( mean semivar delta sortino hv skewness )
+
+for evox in "${evolist[@]}"
+do
+	for mex in "${melist[@]}"
+    do
+        ((n++))
+		echo $n $evox $mex
+		java -jar evocover.jar -tool process -solQtt 30 -wQtt 20 -genQtt 1000 -logFile samples/filteredCSV/part4.csv -reviewFile samples/digestedCSV/digestedBovespa2012.csv -resDir samples/results/ -evo $evox -c 1 -limit 65 -me $mex
+		
+    done 
+done

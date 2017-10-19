@@ -77,8 +77,8 @@ public class Process {
 		graph.randomInit(wQtt);
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
-		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo16_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo16_"+ measure.toString() + "_review.csv");data.addData(graph.formatHeader(measure));
+		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_result.csv");
+		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_review.csv");data.addData(graph.formatHeader(measure));
 		data.addData(graph.formatHeader(measure));
 		data.addReview(graph.formatReviewHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
