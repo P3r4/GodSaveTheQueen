@@ -241,7 +241,7 @@ public class CoverGraph {
 			part += (m.getValue(pOut) - minMe);
 			i++;
 		} while ((i < solutionQtt) && (part < limit));
-		System.out.println(pOut.id);
+		//System.out.println(pOut.id);
 		return pOut;
 	}
 
@@ -257,6 +257,14 @@ public class CoverGraph {
 		String header = "id," + measure.toString() + ",Mean,SemiVar";
 		for (Vertex<StockLog, Cover> v : graph.getVertexList())
 			header += "," + v.getContent().tradeCode;
+		header += "\n";
+		return header;
+	}
+	
+	public String formatReviewHeader(Measure measure) {
+		String header = "id," + measure.toString() + ",Mean,SemiVar";
+		for (Integer v : dayList)
+			header += ","+v;
 		header += "\n";
 		return header;
 	}
@@ -279,6 +287,32 @@ public class CoverGraph {
 				}
 				text += "," + df.format(weight);
 			}
+			text += "\n";
+		}
+		return text;
+	}
+	
+	
+	public String formatReview(Review review, Measure measure){
+		Rank rank = new Rank(solutionList, measure);
+		DecimalFormat df = new DecimalFormat("#0.000000");
+		double weight;
+		String text = "";
+
+		Portfolio p;
+		for (int i = 0; i < 3; i++) {
+			p = rank.rankedList.get(i);
+			review.reset();
+			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.semiVar);
+			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
+				weight = 0;
+				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
+					weight += e.getRelation().coverList.get(p.id);
+				}
+				review.addWeight(weight, v.getContent().tradeCode);
+			}
+			text += review.formatPortfolioReturn();
+			
 			text += "\n";
 		}
 		return text;
@@ -401,7 +435,6 @@ public class CoverGraph {
 		Portfolio p1, p2, pNew;
 		int bestId = rank.getFirst().id;
 
-		
 		for (int i = 0; i < solutionList.size(); i++) {
 			p1 = solutionList.get(i);
 			p2 = lottery(measure);

@@ -5,26 +5,47 @@ import java.io.PrintWriter;
 
 public class PlotData {
 	
-	String fileName;
+	String dataFileName;
+	String reviewFileName;
 	String data;
+	String review;
 	
 	public String getData(){
 		return data;
 	}
 	
-	public PlotData(String fileName){
+	public PlotData(){
 		this.data = "";
-		this.fileName = fileName;
+		this.review = "";
 	}
 	
-	public void add(String moreData){
+	public void addData(String moreData){
 		this.data += moreData;
 	}
 	
-	public void print() throws FileNotFoundException{
-		PrintWriter writer = new PrintWriter(fileName);
+	public void addReview(String moreReview){
+		this.review += moreReview;
+	}
+	
+	public void setReviewFileName(String reviewFileName){
+		this.reviewFileName =  reviewFileName;
+	}
+	
+	public void setDataFileName(String dataFileName){
+		this.dataFileName = dataFileName;
+	}
+	
+	public void printData() throws FileNotFoundException{
+		PrintWriter writer = new PrintWriter(dataFileName);
 		writer.print(data);
 		writer.close();
+	}
+	
+	public void printReview() throws FileNotFoundException{
+		PrintWriter writer = new PrintWriter(reviewFileName);
+		writer.print(review);
+		writer.close();
+		
 	}
 	
 }

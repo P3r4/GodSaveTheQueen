@@ -74,20 +74,6 @@ public class Filter {
 		return graph.getVertexList();
 	}
 
-	public void normalize(int solutionId) {
-		double total, normCover;
-		total = 0;
-		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-			Cover link = e.getRelation();
-			total += link.coverList.get(solutionId);
-		}
-		for (Edge<StockLog, Cover> e : graph.getEdgeList()) {
-			Cover link = e.getRelation();
-			normCover = link.coverList.get(solutionId) / total;
-			link.coverList.set(solutionId, normCover);
-		}
-	}
-
 	private void init(String fileName) throws IOException {
 		graph = new Graph<>();
 		dayList = new ArrayList<>();

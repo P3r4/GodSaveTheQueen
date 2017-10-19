@@ -9,7 +9,7 @@ public class Start {
 		String mssg = "";
 
 		if (att == null)
-			System.out.println("err: empty input");
+			System.out.println("err: -tool not set");
 		else {
 			if (att.equals("filter")) {
 				config = new FilterEndpoint();

@@ -17,6 +17,7 @@ public class ProcessEndpoint implements Endpoint{
     int limit;
 	String logFile;
 	String resDir;
+	String reviewFile;
 	String me;
 	Measure measure;
 
@@ -47,6 +48,10 @@ public class ProcessEndpoint implements Endpoint{
 		att = args.getAttValue("-resDir");
 		if(att == null){return "err: -resDir not set";}
 		resDir = att;
+		
+		att = args.getAttValue("-reviewFile");
+		if(att == null){return "err: -reviewFile not set";}
+		reviewFile = att;
 		
 		att = args.getAttValue("-me");
 		if(att == null){return "err: -me not set";}
@@ -87,7 +92,7 @@ public class ProcessEndpoint implements Endpoint{
 		
 		try {
 			PlotData data;
-			Process p = new Process(solQtt, logFile, resDir);
+			Process p = new Process(solQtt, logFile, resDir,reviewFile);
 			if (evo == 20) {
 				data = p.evo20(wQtt, genQtt, c, limit, measure);
 			} else if (evo == 10) {
@@ -101,7 +106,8 @@ public class ProcessEndpoint implements Endpoint{
 			} else {
 				return "err:  invalid -evo";
 			}
-			data.print();
+			data.printData();
+			data.printReview();
 			return "";
 		} catch (IOException e) {
 			return "err: " + e.getMessage();
