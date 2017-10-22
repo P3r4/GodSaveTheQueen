@@ -2,7 +2,7 @@
 
 # bash for loop
 evolist=( 10 20 16 1015 1615 )
-melist=( mean semivar delta sortino hv skewness )
+melist=( mean dsrisk delta sortino hv skewness )
 
 for evox in "${evolist[@]}"
 do

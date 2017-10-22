@@ -69,8 +69,8 @@ public class ProcessEndpoint implements Endpoint{
 
 		}
 
-		if (me.equals("semivar")) {
-			measure = Measure.SemiVar;
+		if (me.equals("dsrisk")) {
+			measure = Measure.DsRisk;
 		} else if (me.equals("mean")) {
 			measure = Measure.Mean;
 		} else if (me.equals("delta")) {

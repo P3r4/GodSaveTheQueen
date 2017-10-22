@@ -52,10 +52,10 @@ public enum Measure {
 				}
 			};
 		}
-	},SemiVar{
+	},DsRisk{
 		@Override
 		public Double getValue(Portfolio p) {
-			return p.getSemiVar();
+			return p.getDownsideRisk();
 		}
 		
 		@Override

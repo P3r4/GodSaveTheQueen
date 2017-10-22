@@ -254,7 +254,7 @@ public class CoverGraph {
 	}
 
 	public String formatHeader(Measure measure) {
-		String header = "id," + measure.toString() + ",Mean,SemiVar";
+		String header = "id," + measure.toString() + ",Mean,DownSideRisk";
 		for (Vertex<StockLog, Cover> v : graph.getVertexList())
 			header += "," + v.getContent().tradeCode;
 		header += "\n";
@@ -262,7 +262,7 @@ public class CoverGraph {
 	}
 	
 	public String formatReviewHeader(Measure measure) {
-		String header = "id," + measure.toString() + ",Mean,SemiVar";
+		String header = "id," + measure.toString() + ",Mean,DownsideRisk";
 		for (Integer v : dayList)
 			header += ","+v;
 		header += "\n";
@@ -279,7 +279,7 @@ public class CoverGraph {
 
 		for (int i = 0; i < 3; i++) {
 			p = rank.rankedList.get(i);
-			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.semiVar);
+			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.getDownsideRisk());
 			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<StockLog, Cover> e : v.getEdgeList()) {
@@ -303,7 +303,7 @@ public class CoverGraph {
 		for (int i = 0; i < 3; i++) {
 			p = rank.rankedList.get(i);
 			review.reset();
-			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.semiVar);
+			text += p.id + "," + df.format(measure.getValue(p)) + "," + df.format(p.mean) + "," + df.format(p.getDownsideRisk());
 			for (Vertex<StockLog, Cover> v : graph.getVertexList()) {
 				weight = 0;
 				for (Edge<StockLog, Cover> e : v.getEdgeList()) {

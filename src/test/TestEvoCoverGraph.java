@@ -130,7 +130,7 @@ public class TestEvoCoverGraph {
 		}
 		assertEquals(10.0,greatT,0.00000000001);
 		
-		graph.onlookerBeePhase20( Measure.SemiVar);
+		graph.onlookerBeePhase20( Measure.DsRisk);
 			
 		greatT = 0;
 		for (Portfolio p : graph.getSolutionList()) {

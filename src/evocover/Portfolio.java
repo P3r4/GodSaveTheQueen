@@ -23,9 +23,9 @@ public class Portfolio {
 	public Double getMean() {
 		return mean;
 	}
-
-	public Double getSemiVar() {
-		return semiVar;
+	
+	public Double getDownsideRisk(){
+		return Math.sqrt(semiVar);
 	}
 
 	public int getId() {
@@ -33,11 +33,11 @@ public class Portfolio {
 	}
 
 	public Double getHyperVolume() {
-		return (mean + 1) * (skewness + 1) * (1 / semiVar) * (1 / getDelta());
+		return (mean + 1) * (skewness + 1) * (1 / getDownsideRisk()) * (1 / getDelta());
 	}
 
 	public Double getSortinoRatio() {
-		return (mean + 1) / semiVar;
+		return mean / getDownsideRisk();
 	}
 
 }

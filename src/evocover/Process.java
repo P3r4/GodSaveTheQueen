@@ -78,7 +78,7 @@ public class Process {
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
 		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_review.csv");data.addData(graph.formatHeader(measure));
+		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_review.csv");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(graph.formatReviewHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
@@ -96,7 +96,7 @@ public class Process {
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
 		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + "_review.csv");data.addData(graph.formatHeader(measure));
+		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + "_review.csv");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(graph.formatReviewHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
