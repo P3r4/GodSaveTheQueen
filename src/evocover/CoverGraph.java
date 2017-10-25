@@ -261,13 +261,7 @@ public class CoverGraph {
 		return header;
 	}
 	
-	public String formatReviewHeader(Measure measure) {
-		String header = "id," + measure.toString() + ",Mean,DownsideRisk";
-		for (Integer v : dayList)
-			header += ","+v;
-		header += "\n";
-		return header;
-	}
+	
 
 	public String formatResult(Measure measure) {
 		Rank rank = new Rank(solutionList, measure);

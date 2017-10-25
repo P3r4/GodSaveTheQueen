@@ -82,4 +82,13 @@ public class Review {
 			
 		}
 	}
+	
+	public String formatHeader(Measure measure) {
+		String header = "id," + measure.toString() + ",Mean,DownsideRisk";
+		for (Integer v : dayList)
+			header += ","+v;
+		header += "\n";
+		return header;
+	}
+	
 }
