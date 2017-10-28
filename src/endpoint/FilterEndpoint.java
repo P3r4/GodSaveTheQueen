@@ -9,7 +9,7 @@ public class FilterEndpoint implements Endpoint{
 
 	double corrTLimit;
 	double meanBLimit;
-	double semiVarTLimit;
+	double dsRiskTLimit;
 	String file; 
 	String resDir;
 
@@ -19,8 +19,8 @@ public class FilterEndpoint implements Endpoint{
 		try {
 			System.out.println("oioioioioioioioioi");
 			Filter filter = new Filter(file);
-			filter.markGraph(corrTLimit, meanBLimit, semiVarTLimit);
-			filter.writeFilteredCSVFile(resDir, corrTLimit, meanBLimit, semiVarTLimit);
+			filter.markGraph(corrTLimit, meanBLimit, dsRiskTLimit);
+			filter.writeFilteredCSVFile(resDir, corrTLimit, meanBLimit, dsRiskTLimit);
 			return "";
 		} catch (IOException e) {
 			return "err: " + e.getStackTrace();
@@ -40,9 +40,9 @@ public class FilterEndpoint implements Endpoint{
 		if(att == null){return "err: -meanBLimit not set";}
 		meanBLimit = Double.parseDouble(att);
 			
-		att = args.getAttValue("-semiVarTLimit");
-		if(att == null){return "err: -semiVarTLimit not set";}
-		semiVarTLimit = Double.parseDouble(att);
+		att = args.getAttValue("-dsRiskTLimit");
+		if(att == null){return "err: -dsRiskTLimit not set";}
+		dsRiskTLimit = Double.parseDouble(att);
 		
 		att = args.getAttValue("-file");
 		if(att == null){return "err: -file not set";}

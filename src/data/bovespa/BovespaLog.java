@@ -126,7 +126,8 @@ public class BovespaLog {
 	}
 	
 	void setOpeningPrice(String logTxt) {
-		this.openingPrice = Float.parseFloat(logTxt.substring(56, 67).trim());
+		this.openingPrice = Float.parseFloat(logTxt.substring(56, 67).trim())
+				+ Float.parseFloat(logTxt.substring(67, 69).trim())/100;
 	}
 
 	float maxPrice;
@@ -136,7 +137,8 @@ public class BovespaLog {
 	}
 	
 	void setMaxPrice(String logTxt) {
-		this.maxPrice = Float.parseFloat(logTxt.substring(69, 80).trim());
+		this.maxPrice = Float.parseFloat(logTxt.substring(69, 80).trim())
+				+ Float.parseFloat(logTxt.substring(80, 82).trim())/100;
 	}
 
 	float minPrice;
@@ -146,7 +148,8 @@ public class BovespaLog {
 	}
 	
 	void setMinPrice(String logTxt) {
-		this.minPrice = Float.parseFloat(logTxt.substring(82, 93).trim());
+		this.minPrice = Float.parseFloat(logTxt.substring(82, 93).trim())
+				+ Float.parseFloat(logTxt.substring(93, 95).trim())/100;
 	}
 
 	float meanPrice;
@@ -156,7 +159,8 @@ public class BovespaLog {
 	}
 	
 	void setMeanPrice(String logTxt) {
-		this.meanPrice = Float.parseFloat(logTxt.substring(95, 106).trim());
+		this.meanPrice = Float.parseFloat(logTxt.substring(95, 106).trim())
+				+ Float.parseFloat(logTxt.substring(106, 108).trim())/100;
 	}
 
 	float lastPrice;
@@ -166,7 +170,8 @@ public class BovespaLog {
 	}
 	
 	void setLastPrice(String logTxt) {
-		this.lastPrice = Float.parseFloat(logTxt.substring(108, 119).trim());
+		this.lastPrice = Float.parseFloat(logTxt.substring(108, 119).trim())
+				+ Float.parseFloat(logTxt.substring(119, 121).trim())/100;
 	}
 
 	float bestBuyPrice;
@@ -176,7 +181,8 @@ public class BovespaLog {
 	}
 	
 	void setBestBuyPrice(String logTxt) {
-		this.bestBuyPrice = Float.parseFloat(logTxt.substring(121, 132).trim());
+		this.bestBuyPrice = Float.parseFloat(logTxt.substring(121, 132).trim())
+				+ Float.parseFloat(logTxt.substring(132, 134).trim())/100;
 	}
 
 	float bestSalePrice;
@@ -186,7 +192,8 @@ public class BovespaLog {
 	}
 	
 	void setBestSalePrice(String logTxt) {
-		this.bestSalePrice = Float.parseFloat(logTxt.substring(134, 145).trim());
+		this.bestSalePrice = Float.parseFloat(logTxt.substring(134, 145).trim())
+				+ Float.parseFloat(logTxt.substring(145, 147).trim())/100;
 	}
 
 	int qttOfTrades;

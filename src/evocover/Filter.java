@@ -22,16 +22,16 @@ public class Filter {
 		initAllRelations();
 	}
 
-	public void markGraph(double corrTLimit, double meanBLimit, double semiVarTLimit) {
+	public void markGraph(double corrTLimit, double meanBLimit, double dsRiskTLimit) {
 
 		for (Vertex<StockLog, Cover> vertex : graph.getVertexList()) {
-			if (vertex.getContent().mean < meanBLimit && vertex.getContent().variance > semiVarTLimit) {
+			if (vertex.getContent().mean < meanBLimit && vertex.getContent().standardDeviation > dsRiskTLimit) {
 				vertex.getContent().flag = 1;
 				System.out.println("mark1");
 			} else if (vertex.getContent().mean < meanBLimit) {
 				vertex.getContent().flag = 2;
 				System.out.println("mark2");
-			} else if (vertex.getContent().variance > semiVarTLimit) {
+			} else if (vertex.getContent().standardDeviation > dsRiskTLimit) {
 				vertex.getContent().flag = 3;
 				System.out.println("mark3");
 			} else {
