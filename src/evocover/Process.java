@@ -22,8 +22,8 @@ public class Process {
 		graph.randomInit(wQtt);
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
-		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo20_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo20_"+ measure.toString() + "_review.csv");
+		data.setDataFileName(resultDir +"result_"+solQtt+"_"+genQtt+"_evo20_"+ measure.toString() + ".txt");
+		data.setReviewFileName(resultDir +"review_"+solQtt+"_"+genQtt+"_evo20_"+ measure.toString() + ".txt");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(review.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
@@ -41,8 +41,8 @@ public class Process {
 		graph.randomInit(wQtt);
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
-		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo16_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo16_"+ measure.toString() + "_review.csv");
+		data.setDataFileName(resultDir +"result_"+solQtt+"_"+genQtt+"_evo16_"+ measure.toString() + ".txt");
+		data.setReviewFileName(resultDir +"review_"+solQtt+"_"+genQtt+"_evo16_"+ measure.toString() + ".txt");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(review.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
@@ -59,8 +59,8 @@ public class Process {
 		graph.randomInit(wQtt);
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
-		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo10_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo10_"+ measure.toString() + "_review.csv");
+		data.setDataFileName(resultDir +"result_"+solQtt+"_"+genQtt+"_evo10_"+ measure.toString() + ".txt");
+		data.setReviewFileName(resultDir +"review_"+solQtt+"_"+genQtt+"_evo10_"+ measure.toString() + ".txt");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(review.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
@@ -77,8 +77,8 @@ public class Process {
 		graph.randomInit(wQtt);
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
-		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + "_review.csv");
+		data.setDataFileName(resultDir +"result_"+solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + ".txt");
+		data.setReviewFileName(resultDir +"review_"+solQtt+"_"+genQtt+"_evo1615_"+ measure.toString() + ".txt");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(review.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {
@@ -95,8 +95,8 @@ public class Process {
 		graph.randomInit(wQtt);
 		PlotData data = new PlotData();
 		Review review = new Review(this.reviewFileName);
-		data.setDataFileName(resultDir +solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + "_result.csv");
-		data.setReviewFileName(resultDir +solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + "_review.csv");
+		data.setDataFileName(resultDir +"result_"+solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + ".txt");
+		data.setReviewFileName(resultDir +"review_"+solQtt+"_"+genQtt+"_evo1015_"+ measure.toString() + ".txt");
 		data.addData(graph.formatHeader(measure));
 		data.addReview(review.formatHeader(measure));
 		for (int i = 0; i < genQtt; i++) {

@@ -63,7 +63,8 @@ public enum Measure {
 			return new Comparator<Portfolio>() {
 				@Override
 				public int compare(Portfolio o1, Portfolio o2) {
-					return o1.semiVar.compareTo(o2.semiVar);
+					Double s = Math.sqrt(o1.semiVar);
+					return s.compareTo(Math.sqrt(o2.semiVar));
 				}
 			};
 		}

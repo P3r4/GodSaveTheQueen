@@ -33,7 +33,7 @@ public class Portfolio {
 	}
 
 	public Double getHyperVolume() {
-		return (mean + 1) * (skewness + 1) * (1 / getDownsideRisk()) * (1 / getDelta());
+		return (mean + 1) * (skewness + 1) * (1 / (getDownsideRisk()*2)) * (1 / (getDelta()*2));
 	}
 
 	public Double getSortinoRatio() {

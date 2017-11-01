@@ -1,0 +1,123 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>evocover-plot</title>
+    <script src="./Chart.bundle.js"></script>
+	<script src="./utils.js"></script>
+	<style>
+    canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    </style>
+  <script>
+  
+	
+    var chartData = {
+		datasets: new Array()
+    };
+  
+	function buildDataUnit(line){
+		var values = line.split(',');
+		var mean = 2;
+		var dsrisk = 3;
+		return {x: values[dsrisk], y: values[mean]};
+	}
+	
+	function getRandomColor() {
+		var letters = '0123456789ABCDEF';
+		var color = '#';
+		for (var i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
+	}
+	
+    function buildDataSet(text,dataLabel){
+	    var color = getRandomColor();
+		var lines;
+		var unitArr;
+		       
+		lines =  text.split("\n");
+		unitArr = [] ;
+		for(i=1; i<(lines.length-1); i++){
+			//console.log(i);
+			unitArr.push(buildDataUnit(lines[i]));
+		}
+		
+		return {
+			label: dataLabel,
+			borderColor: color,
+            backgroundColor: color,
+			data: unitArr
+		}
+    }
+	
+	function refreshChart(){
+	
+		if(window.myScatter) window.myScatter.destroy();
+	
+		var ctx = document.getElementById("canvas").getContext("2d");
+		
+        window.myScatter = Chart.Scatter(ctx, {
+            data: chartData,
+            options: {
+				
+				animation: 0,
+
+                title: {
+                    display: true,
+                    text: 'Chart.js Scatter Chart'
+                },
+            }
+        });
+	}
+	
+	function read(file) {
+		var textType = /text.*/;
+		var name = file.name;
+		var reader;  
+		if (file.type.match(textType)) {
+            reader = new FileReader();
+			reader.onload = function(e) {	
+				chartData.datasets.push(buildDataSet(reader.result,file.name));
+				refreshChart();
+            }
+            reader.readAsText(file);			
+        } else {
+            console.log("File not supported!");
+        }  
+    }
+
+	window.onload = function() {
+        var fileInput = document.getElementById('fileInput');
+		var logArea = document.getElementById('logArea');
+		fileInput.addEventListener('change', function(e) {
+            console.log(fileInput.files);
+            for (i = 0; i < fileInput.files.length; i++) { 
+                read(fileInput.files[i]);
+            }	    
+        });
+    }
+
+  </script>
+</head>
+<body>
+    <div id="page-wrapper">
+		
+		<div>
+			Select a text file: 
+			<input type="file" id="fileInput" multiple>
+		</div>
+		<h2>Gráfico de Convergência, eixo X: Downside Risk, eixo Y: Retorno</h2>
+		<pre id="logArea"></pre>
+		<div style="width:75%">
+			<canvas id="canvas"></canvas>
+		</div>
+	</div>
+</html>
+
