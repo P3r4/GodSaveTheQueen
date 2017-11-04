@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>evocover-plot</title>
+    <script src="./Chart.bundle.js"></script>
+	<script src="./utils.js"></script>
+	<style>
+    canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    </style>
+  <script>
+  
+    var chartData = {
+		labels: new Array(),
+		datasets: new Array()
+    };
+  
+	function buildDataUnit(line){
+		var values = line.split(',');
+		return values.slice(4);
+	}
+	
+	function getRandomColor() {
+		var letters = '0123456789ABCDEF';
+		var color = '#';
+		for (var i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
+	}
+	
+    function buildDataSet(text,dataLabel){
+	    var color = getRandomColor();
+		var lines;
+		var unitArr;
+		       
+		lines =  text.split("\n");
+	    unitArr = buildDataUnit(lines[1]);
+		
+		return {
+            label: dataLabel,
+            borderColor: color,
+            backgroundColor: color,
+            fill: false,
+            data: unitArr
+		}
+    }
+	
+	function buildHeader(text){
+		var lines;
+		lines = text.split('\n');
+		return buildDataUnit(lines[0]);
+	}
+	
+	function readHeader(file){
+		var textType = /text.*/;
+		if (file.type.match(textType)) {
+            reader = new FileReader();
+			reader.onload = function(e) {
+				chartData.labels = buildHeader(reader.result);
+			}
+            reader.readAsText(file);			
+        } else {
+            console.log("File not supported!");
+        }  
+		
+	}
+	
+	function read(file) {
+		var textType = /text.*/;
+		var name = file.name;
+		var reader;  
+		if (file.type.match(textType)) {
+            reader = new FileReader();
+			reader.onload = function(e) {
+				var ds = buildDataSet(reader.result,file.name);
+				console.log(ds);
+				chartData.datasets.push(ds);
+				refreshChart();	
+            }
+            reader.readAsText(file);			
+        } else {
+            console.log("File not supported!");
+        }  
+    }
+
+	window.onload = function() {
+        var fileInput = document.getElementById('fileInput');
+		var logArea = document.getElementById('logArea');
+		fileInput.addEventListener('change', function(e) {
+            console.log(fileInput.files);
+			readHeader(fileInput.files[0]);
+            for (i = 0; i < fileInput.files.length; i++) { 
+                read(fileInput.files[i]);
+				
+            }
+				
+        });
+    }
+	 
+	function refreshChart(){
+	
+		if(window.myLine) window.myLine.destroy();
+	
+		var ctx = document.getElementById("canvas").getContext("2d");
+        window.myLine = new Chart(ctx,{
+				type: 'line',
+				data: chartData,
+				options: {
+					responsive: true,
+					title:{
+						display:true,
+						text:'Chart.js Line Chart'
+					},
+					tooltips: {
+						mode: 'index',
+						intersect: false,
+					},
+					hover: {
+						mode: 'nearest',
+						intersect: true
+					},
+					scales: {
+						xAxes: [{
+							display: true,
+							scaleLabel: {
+								display: true,
+								labelString: 'Month'
+							}
+						}],
+						yAxes: [{
+							display: true,
+							scaleLabel: {
+								display: true,
+								labelString: 'Value'
+							}
+						}]
+					}
+				}
+			}
+		);
+	}
+
+  </script>
+</head>
+<body>
+    <div id="page-wrapper">
+		<div>
+			Select a text file: 
+			<input type="file" id="fileInput" multiple>
+		</div>
+		<h2>Gráfico de Retorno, eixo X: Tempo, eixo Y: Retorno</h2>
+		<pre id="logArea"></pre>
+		<div style="width:75%">
+			<canvas id="canvas"></canvas>
+		</div>
+	</div>
+</html>
+
